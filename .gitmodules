@@ -1,0 +1,9 @@
+[submodule "modules/SearchSECOSpider"]
+	path = modules/SearchSECOSpider
+	url = https://github.com/SecureSECO/SearchSECOSpider.git
+[submodule "modules/SearchSECOParser"]
+	path = modules/SearchSECOParser
+	url = https://github.com/SecureSECO/SearchSECOParser.git
+[submodule "modules/SearchSECOCrawler"]
+	path = modules/SearchSECOCrawler
+	url = https://github.com/SecureSECO/SearchSECOCrawler.git
