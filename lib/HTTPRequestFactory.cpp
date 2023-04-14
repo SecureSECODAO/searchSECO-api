@@ -13,7 +13,11 @@ void SpiderRequestHandler::handleRequest(
     auto url = form.get("url", "");
     auto result = "hello world from the spider";
 
-
+    stringstream ss;
+    ss << result;
+    response.setChunkedTransferEncoding(true);
+    response.setContentType("text/plain");
+    response.sendBuffer(ss.str().c_str(), ss.str().size());
 }
 
 void ParserRequestHandler::handleRequest(
@@ -22,7 +26,13 @@ void ParserRequestHandler::handleRequest(
 {
     HTMLForm form(request);
     auto url = form.get("url", "");
-    auto result = "hello world from the spider";
+    auto result = "hello world from the parser";
+
+     stringstream ss;
+    ss << result;
+    response.setChunkedTransferEncoding(true);
+    response.setContentType("text/plain");
+    response.sendBuffer(ss.str().c_str(), ss.str().size());
 }
 
 HTTPRequestHandler* RequestHandlerFactory::createRequestHandler(const HTTPServerRequest& request)
