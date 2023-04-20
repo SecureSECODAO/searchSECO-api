@@ -1,4 +1,4 @@
-import HashData from "./HashData.ts";
+import HashData from "./utils/HashData";
 import { IParser } from "./languages/parserBase.ts";
 import Javascript from "./languages/javascript/parser.ts";
 import Python from "./languages/python/parser.ts";
@@ -16,10 +16,10 @@ export default class Parser {
         [Language.PYTHON, new Python()]
     ]);
 
-    public static async ParseFiles(files: string[]): Promise<HashData[]> {
-        const result = [] as HashData[]
+    public static async ParseFiles(files: string[]): Promise<Map<string, HashData[]>[]> {
+        const result = [] as Map<string, HashData[]>[]
         files.forEach(file => {
-            const lang = Parser.getLanguage(file)
+            const { filename, lang } = Parser.getFileName(file) ?? { filename: "" }
             if (!lang)
                 return
 
@@ -28,21 +28,23 @@ export default class Parser {
             if (!parser)
                 return
 
-            parser.AddFile(content)
+            parser.AddFile(content, filename)
         })
 
         await Promise.all([...this.parsers.values()].map(async p => {
             const data = await p.Parse()
-            result.push(...data)
+            result.push(data)
         }))
     
         return result
     }
 
-    private static getLanguage(filepath: string): Language | undefined {
-        switch (filepath.split('.').pop()) {
-            case "py": return Language.PYTHON
-            case "js": return Language.JS
+    private static getFileName(filepath: string): {filename: string, lang: Language} | undefined {
+        const filename = filepath.split('\\').pop()?.split('/').pop();
+
+        switch (filename?.split('.').pop()) {
+            case "py": return {filename, lang: Language.PYTHON} 
+            case "js": return {filename, lang: Language.JS} 
             default: return undefined
         }
     }

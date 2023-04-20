@@ -5,7 +5,7 @@ import fs from 'fs';
 
 
 (async () => {
-    const files = [] as string[];
+    const files = ["./test/a.js"]
     const test_dir = './test/'
     
     function getFiles(dir: string) {
@@ -16,8 +16,10 @@ import fs from 'fs';
         });
     }
     
-    getFiles(test_dir)
+    //getFiles(test_dir)
     
+    
+
     const parsed = await Parser.ParseFiles(files)
 
     // console.log(parsed)
