@@ -4,7 +4,7 @@ import GithubInterface from './src/GithubInterface';
 import winston from 'winston'
 import expressWinston from 'express-winston'
 
-const githubInterface = new GithubInterface("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")
+const githubInterface = new GithubInterface(process.env.github_token??'')
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
