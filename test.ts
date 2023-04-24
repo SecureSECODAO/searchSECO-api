@@ -5,8 +5,8 @@ import fs from 'fs';
 
 
 (async () => {
-    const files = ["./test/a.js"]
-    const test_dir = './test/'
+    const files = ["./test/a.py"]
+    const test_dir = 'i-voted-for-trump-is-odd-master'
     
     function getFiles(dir: string, acc: string[] = []): string[] {
         fs.readdirSync(dir).forEach((file: string) => {
@@ -17,7 +17,7 @@ import fs from 'fs';
         return acc
     }
 
-    const parsed = await Parser.ParseFiles({files})
-    console.log(parsed.values())
+    const { filenames, result } = await Parser.ParseFiles({ path: test_dir })
+    console.log(result.values())
 })()
 

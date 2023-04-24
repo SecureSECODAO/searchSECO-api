@@ -1,4 +1,4 @@
-import HashData from "../../utils/HashData";
+import HashData from "../../utils/HashData.ts";
 import { ParserBase } from "../parserBase.ts";
 import antlr4ts from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker.js'

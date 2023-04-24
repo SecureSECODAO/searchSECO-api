@@ -1,14 +1,16 @@
 import HashData from "./utils/HashData";
 import { IParser } from "./languages/parserBase.ts";
-import Javascript from "./languages/javascript/parser.ts";
-import Python from "./languages/python/parser.ts";
+import Javascript from "./languages/javascript/jsParser.ts";
+import Python from "./languages/python3/pythonParser.ts";
 import * as fs from 'fs'
 import path from 'path'
+
+const baseDir = '.temp'
 
 enum Language {
     PYTHON = 1,
     JS
-}
+}2
 
 function getFiles(dir: string, acc: string[] = []): string[] {
     fs.readdirSync(dir).forEach((file: string) => {
@@ -26,14 +28,16 @@ export default class Parser {
     ]);
 
 
-    public static async ParseFiles({path, files}: {path?: string, files?: string[]}): Promise<Map<string, HashData[]>> {
-        if (!files) files = getFiles(path??'')
+    public static async ParseFiles({path, files}: {path?: string, files?: string[]}): Promise<{filenames: string[], result: Map<string, HashData[]>}> {
+        if (!files) files = getFiles(`${baseDir}/${path}`)
+        const filenames = [] as string[]
         let result = new Map<string, HashData[]>()
         files.forEach(file => {
             const { filename, lang } = Parser.getFileName(file) ?? { filename: "" }
             if (!lang)
                 return
 
+            filenames.push(filename)
             const content = fs.readFileSync(file, 'utf-8')
             const parser = Parser.parsers.get(lang)
             if (!parser)
@@ -47,11 +51,11 @@ export default class Parser {
             result = new Map([...result, ...content])
         }))
     
-        return result
+        return { filenames, result }
     }
 
     private static getFileName(filepath: string): {filename: string, lang: Language} | undefined {
-        const filename = filepath.split('\\').pop()?.split('/').pop();
+        const filename = filepath.split('\\').pop()
 
         switch (filename?.split('.').pop()) {
             case "py": return {filename, lang: Language.PYTHON} 

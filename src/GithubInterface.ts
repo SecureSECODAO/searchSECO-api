@@ -4,13 +4,13 @@ import rp from 'request-promise'
 import JSZip from 'jszip'
 import unzip from 'unzip-stream'
 
-async function sleep(ms: number) {
+export async function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 const baseUrl = 'https://api.github.com'
 
-export default class GithubInterface {
+export class GithubInterface {
     private readonly _octokit: Octokit
 
     constructor(token: string) {
@@ -39,10 +39,12 @@ export default class GithubInterface {
     public async DownloadRepository(url: string): Promise<string | undefined> {
         const { owner, repo } = GithubInterface.parseURL(url)
         const { name, owner: { login }, default_branch: ref } = await this.fetchRepo(owner, repo)
-        const targetPath = `./.temp/${login}-${name}-${ref}`
+        
+        const dirName =  `${login}-${name}-${ref}`
+        const targetPath = `./.temp/${dirName}`
 
         if (fs.existsSync(targetPath))
-            return targetPath
+            return dirName
 
         const options = {
             headers: {
@@ -60,7 +62,7 @@ export default class GithubInterface {
         }
 
         await this.unpack(targetPath)
-        return targetPath
+        return dirName
     }
 }
 

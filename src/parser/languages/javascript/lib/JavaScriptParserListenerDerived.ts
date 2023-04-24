@@ -1,4 +1,4 @@
-import { JavaScriptParserListener } from "./JavaScriptParserListener";
+import { JavaScriptParserListener } from "./JavaScriptParserListener.ts";
 import md5 from 'md5'
 import HashData from "../../../utils/HashData.ts";
 import { TokenStreamRewriter } from "antlr4ts";
@@ -56,7 +56,6 @@ export default class JSListener implements JavaScriptParserListener {
         const start = this.starts.pop() ?? 0
         const stop = ctx.stop?.line ?? 0
 
-        console.log(functionBody)
         if (stop - start >= this.minMethodSize)
             this.output.push(new HashData(md5(functionBody), this.filename, functionName, start, stop))
 
@@ -82,7 +81,7 @@ export default class JSListener implements JavaScriptParserListener {
 
         const start = this.starts.pop() ?? 0
         const stop = ctx.stop?.line ?? 0
-        console.log(functionBody)
+
         if (stop - start >= this.minMethodSize) {
             const hashData = new HashData(md5(functionBody), this.filename, functionName, start, stop)
             this.output.push(hashData)
@@ -107,9 +106,8 @@ export default class JSListener implements JavaScriptParserListener {
 
     enterIdentifier(ctx: IdentifierContext) {
         const name = this.functionNames.pop()??''
-        if (this.inNonAbsoluteFunctionDef && name === "") {
+        if (this.inNonAbsoluteFunctionDef && !name) {
             this.functionNames.push(ctx.start.text??'')
-            return
         }
 
         if (name)

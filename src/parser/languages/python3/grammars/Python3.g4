@@ -43,7 +43,7 @@ tokens {
   private opened: number = 0;
   private last_token: Token|undefined = undefined;
 
-  @Override
+  // @Override
   public reset(): void {
     // A queue where extra tokens are pushed on (see the NEWLINE lexer rule).
     this.token_queue = [];
@@ -57,7 +57,7 @@ tokens {
     super.reset();
   };
 
-  @Override
+  // @Override
   public emit(token?: Token): Token {
     if (token) {
       token = super.emit(token);
@@ -75,7 +75,7 @@ tokens {
    * literal.
    *
    */
-  @Override
+  // @Override
   public nextToken(): Token {
     // Check if the end-of-file is ahead and there are still some DEDENTS expected.
     if (this.inputStream.LA(1) === Python3Parser.EOF && this.indents.length) {
@@ -109,7 +109,7 @@ tokens {
   }
 
   private createDedent(): Token {
-    let dedent = this.commonToken(Python3Parser.DEDENT, "");
+    let dedent = this.commonToken(Python3Parser.DEDENT, "dedent"); // Custom
     if (this.last_token) {
       dedent.line = this.last_token.line;
     }
@@ -155,91 +155,46 @@ single_input: NEWLINE | simple_stmt | compound_stmt NEWLINE;
 file_input: (NEWLINE | stmt)* EOF;
 eval_input: testlist NEWLINE* EOF;
 
-decorator: '@' dotted_name ( '(' (arglist)? ')')? NEWLINE;
+decorator: '@' dotted_name ( '(' (arglist)? ')' )? NEWLINE;
 decorators: decorator+;
 decorated: decorators (classdef | funcdef | async_funcdef);
 
 async_funcdef: ASYNC funcdef;
-funcdef: 'def' NAME parameters ('->' test)? ':' suite;
+funcdef: 'def' name parameters ('->' test)? ':' funcbody;
+
+funcbody: suite; // Custom
 
 parameters: '(' (typedargslist)? ')';
-typedargslist: (
-		tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (
-			',' (
-				'*' (tfpdef)? (',' tfpdef ('=' test)?)* (
-					',' ('**' tfpdef (',')?)?
-				)?
-				| '**' tfpdef (',')?
-			)?
-		)?
-		| '*' (tfpdef)? (',' tfpdef ('=' test)?)* (
-			',' ('**' tfpdef (',')?)?
-		)?
-		| '**' tfpdef (',')?
-	);
-tfpdef: NAME (':' test)?;
-varargslist: (
-		vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (
-			',' (
-				'*' (vfpdef)? (',' vfpdef ('=' test)?)* (
-					',' ('**' vfpdef (',')?)?
-				)?
-				| '**' vfpdef (',')?
-			)?
-		)?
-		| '*' (vfpdef)? (',' vfpdef ('=' test)?)* (
-			',' ('**' vfpdef (',')?)?
-		)?
-		| '**' vfpdef (',')?
-	);
-vfpdef: NAME;
+typedargslist: (tfpdef ('=' test)? (',' tfpdef ('=' test)?)* (',' (
+        '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
+      | '**' tfpdef (',')?)?)?
+  | '*' (tfpdef)? (',' tfpdef ('=' test)?)* (',' ('**' tfpdef (',')?)?)?
+  | '**' tfpdef (',')?);
+tfpdef: name (':' test)?;
+varargslist: (vfpdef ('=' test)? (',' vfpdef ('=' test)?)* (',' (
+        '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+      | '**' vfpdef (',')?)?)?
+  | '*' (vfpdef)? (',' vfpdef ('=' test)?)* (',' ('**' vfpdef (',')?)?)?
+  | '**' vfpdef (',')?
+);
+vfpdef: name;
 
-stmt: simple_stmt | compound_stmt;
+stmt: simple_stmt | compound_stmt; //| INDENT NEWLINE DEDENT;	//Custom
 simple_stmt: small_stmt (';' small_stmt)* (';')? NEWLINE;
-small_stmt: (
-		expr_stmt
-		| del_stmt
-		| pass_stmt
-		| flow_stmt
-		| import_stmt
-		| global_stmt
-		| nonlocal_stmt
-		| assert_stmt
-	);
-expr_stmt:
-	testlist_star_expr (
-		annassign
-		| augassign (yield_expr | testlist)
-		| ('=' (yield_expr | testlist_star_expr))*
-	);
+small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt |
+             import_stmt | global_stmt | nonlocal_stmt | assert_stmt);
+expr_stmt: expr_stmt_single | expr_stmt_multi;	// Custom
+expr_stmt_single: testlist_star_expr;	// Custom
+expr_stmt_multi: testlist_star_expr (annassign | augassign (yield_expr|testlist) |
+                     ('=' (yield_expr|testlist_star_expr))+);	// Custom
 annassign: ':' test ('=' test)?;
-testlist_star_expr: (test | star_expr) (',' (test | star_expr))* (
-		','
-	)?;
-augassign: (
-		'+='
-		| '-='
-		| '*='
-		| '@='
-		| '/='
-		| '%='
-		| '&='
-		| '|='
-		| '^='
-		| '<<='
-		| '>>='
-		| '**='
-		| '//='
-	);
+testlist_star_expr: (test|star_expr) (',' (test|star_expr))* (',')?;
+augassign: ('+=' | '-=' | '*=' | '@=' | '/=' | '%=' | '&=' | '|=' | '^=' |
+            '<<=' | '>>=' | '**=' | '//=');
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: 'del' exprlist;
 pass_stmt: 'pass';
-flow_stmt:
-	break_stmt
-	| continue_stmt
-	| return_stmt
-	| raise_stmt
-	| yield_stmt;
+flow_stmt: break_stmt | continue_stmt | return_stmt | raise_stmt | yield_stmt;
 break_stmt: 'break';
 continue_stmt: 'continue';
 return_stmt: 'return' (testlist)?;
@@ -248,54 +203,32 @@ raise_stmt: 'raise' (test ('from' test)?)?;
 import_stmt: import_name | import_from;
 import_name: 'import' dotted_as_names;
 // note below: the ('.' | '...') is necessary because '...' is tokenized as ELLIPSIS
-import_from: (
-		'from' (('.' | '...')* dotted_name | ('.' | '...')+) 'import' (
-			'*'
-			| '(' import_as_names ')'
-			| import_as_names
-		)
-	);
-import_as_name: NAME ('as' NAME)?;
-dotted_as_name: dotted_name ('as' NAME)?;
+import_from: ('from' (('.' | '...')* dotted_name | ('.' | '...')+)
+              'import' ('*' | '(' import_as_names ')' | import_as_names));
+import_as_name: name ('as' name)?;
+dotted_as_name: dotted_name ('as' name)?;
 import_as_names: import_as_name (',' import_as_name)* (',')?;
 dotted_as_names: dotted_as_name (',' dotted_as_name)*;
-dotted_name: NAME ('.' NAME)*;
-global_stmt: 'global' NAME (',' NAME)*;
-nonlocal_stmt: 'nonlocal' NAME (',' NAME)*;
+dotted_name: name ('.' name)*;
+global_stmt: 'global' name (',' name)*;
+nonlocal_stmt: 'nonlocal' name (',' name)*;
 assert_stmt: 'assert' test (',' test)?;
 
-compound_stmt:
-	if_stmt
-	| while_stmt
-	| for_stmt
-	| try_stmt
-	| with_stmt
-	| funcdef
-	| classdef
-	| decorated
-	| async_stmt;
+compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt;
 async_stmt: ASYNC (funcdef | with_stmt | for_stmt);
-if_stmt:
-	'if' test ':' suite ('elif' test ':' suite)* (
-		'else' ':' suite
-	)?;
+if_stmt: 'if' test ':' suite ('elif' test ':' suite)* ('else' ':' suite)?;
 while_stmt: 'while' test ':' suite ('else' ':' suite)?;
-for_stmt:
-	'for' exprlist 'in' testlist ':' suite ('else' ':' suite)?;
-try_stmt: (
-		'try' ':' suite (
-			(except_clause ':' suite)+ ('else' ':' suite)? (
-				'finally' ':' suite
-			)?
-			| 'finally' ':' suite
-		)
-	);
-with_stmt: 'with' with_item (',' with_item)* ':' suite;
+for_stmt: 'for' exprlist 'in' testlist ':' suite ('else' ':' suite)?;
+try_stmt: ('try' ':' suite
+           ((except_clause ':' suite)+
+            ('else' ':' suite)?
+            ('finally' ':' suite)? |
+           'finally' ':' suite));
+with_stmt: 'with' with_item (',' with_item)*  ':' suite;
 with_item: test ('as' expr)?;
 // NB compile.c makes sure that the default except clause is last
-except_clause: 'except' (test ('as' NAME)?)?;
+except_clause: 'except' (test ('as' name)?)?;
 suite: simple_stmt | NEWLINE INDENT stmt+ DEDENT;
-
 test: or_test ('if' or_test 'else' test)? | lambdef;
 test_nocond: or_test | lambdef_nocond;
 lambdef: 'lambda' (varargslist)? ':' test;
@@ -304,94 +237,69 @@ or_test: and_test ('or' and_test)*;
 and_test: not_test ('and' not_test)*;
 not_test: 'not' not_test | comparison;
 comparison: expr (comp_op expr)*;
-// <> isn't actually a valid comparison operator in Python. It's here for the sake of a __future__
-// import described in PEP 401 (which really works :-)
-comp_op:
-	'<'
-	| '>'
-	| '=='
-	| '>='
-	| '<='
-	| '<>'
-	| '!='
-	| 'in'
-	| 'not' 'in'
-	| 'is'
-	| 'is' 'not';
+// <> isn't actually a valid comparison operator in Python. It's here for the
+// sake of a __future__ import described in PEP 401 (which really works :-)
+comp_op: '<'|'>'|'=='|'>='|'<='|'<>'|'!='|'in'|'not' 'in'|'is'|'is' 'not';
 star_expr: '*' expr;
 expr: xor_expr ('|' xor_expr)*;
 xor_expr: and_expr ('^' and_expr)*;
 and_expr: shift_expr ('&' shift_expr)*;
-shift_expr: arith_expr (('<<' | '>>') arith_expr)*;
-arith_expr: term (('+' | '-') term)*;
-term: factor (('*' | '@' | '/' | '%' | '//') factor)*;
-factor: ('+' | '-' | '~') factor | power;
+shift_expr: arith_expr (('<<'|'>>') arith_expr)*;
+arith_expr: term (('+'|'-') term)*;
+term: factor (('*'|'@'|'/'|'%'|'//') factor)*;
+factor: ('+'|'-'|'~') factor | power;
 power: atom_expr ('**' factor)?;
-atom_expr: (AWAIT)? atom trailer*;
-atom: (
-		'(' (yield_expr | testlist_comp)? ')'
-		| '[' (testlist_comp)? ']'
-		| '{' (dictorsetmaker)? '}'
-		| NAME
-		| NUMBER
-		| STRING+
-		| '...'
-		| 'None'
-		| 'True'
-		| 'False'
-	);
-testlist_comp: (test | star_expr) (
-		comp_for
-		| (',' (test | star_expr))* (',')?
-	);
-trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' NAME;
+//atom_expr: (AWAIT)? atom trailer*;
+atom_expr: (AWAIT)? (funccall | atom) trailer*;   // Custom.
+funccall: funccallname '(' (arglist)? ')';	// Custom.
+atom: ('(' (yield_expr|testlist_comp)? ')' |
+       '[' (testlist_comp)? ']' |
+       '{' (dictorsetmaker)? '}' |
+       name | NUMBER | string+ | '...' | 'None' | 'True' | 'False');
+string: STRING;	//Custom
+name: NAME; //Custom
+funccallname: NAME; //Custom
+testlist_comp: (test|star_expr) ( comp_for | (',' (test|star_expr))* (',')? );
+//trailer: '(' (arglist)? ')' | '[' subscriptlist ']' | '.' name;
+trailer: '.' funccall | '[' subscriptlist ']' | '.' name;    // Custom.
 subscriptlist: subscript (',' subscript)* (',')?;
 subscript: test | (test)? ':' (test)? (sliceop)?;
 sliceop: ':' (test)?;
-exprlist: (expr | star_expr) (',' (expr | star_expr))* (',')?;
+exprlist: (expr|star_expr) (',' (expr|star_expr))* (',')?;
 testlist: test (',' test)* (',')?;
-dictorsetmaker: (
-		(
-			(test ':' test | '**' expr) (
-				comp_for
-				| (',' (test ':' test | '**' expr))* (',')?
-			)
-		)
-		| (
-			(test | star_expr) (
-				comp_for
-				| (',' (test | star_expr))* (',')?
-			)
-		)
-	);
+dictorsetmaker: ( ((test ':' test | '**' expr)
+                   (comp_for | (',' (test ':' test | '**' expr))* (',')?)) |
+                  ((test | star_expr)
+                   (comp_for | (',' (test | star_expr))* (',')?)) );
 
-classdef: 'class' NAME ('(' (arglist)? ')')? ':' suite;
+classdef: 'class' name ('(' (arglist)? ')')? ':' suite;
 
-arglist: argument (',' argument)* (',')?;
+arglist: argument (',' argument)*  (',')?;
 
-// The reason that keywords are test nodes instead of NAME is that using NAME results in an
-// ambiguity. ast.c makes sure it's a NAME. "test '=' test" is really "keyword '=' test", but we
-// have no such token. These need to be in a single rule to avoid grammar that is ambiguous to our
-// LL(1) parser. Even though 'test' includes '*expr' in star_expr, we explicitly match '*' here,
-// too, to give it proper precedence. Illegal combinations and orderings are blocked in ast.c:
-// multiple (test comp_for) arguments are blocked; keyword unpackings that precede iterable
-// unpackings are blocked; etc.
-argument: (
-		test (comp_for)?
-		| test '=' test
-		| '**' test
-		| '*' test
-	);
+// The reason that keywords are test nodes instead of name is that using name
+// results in an ambiguity. ast.c makes sure it's a name.
+// "test '=' test" is really "keyword '=' test", but we have no such token.
+// These need to be in a single rule to avoid grammar that is ambiguous
+// to our LL(1) parser. Even though 'test' includes '*expr' in star_expr,
+// we explicitly match '*' here, too, to give it proper precedence.
+// Illegal combinations and orderings are blocked in ast.c:
+// multiple (test comp_for) arguments are blocked; keyword unpackings
+// that precede iterable unpackings are blocked; etc.
+argument: ( test (comp_for)? |
+            test '=' test |
+            '**' test |
+            '*' test );
 
 comp_iter: comp_for | comp_if;
 comp_for: (ASYNC)? 'for' exprlist 'in' or_test (comp_iter)?;
 comp_if: 'if' test_nocond (comp_iter)?;
 
 // not used in grammar, but may appear in "node" passed from Parser to Compiler
-encoding_decl: NAME;
+encoding_decl: name;
 
 yield_expr: 'yield' (yield_arg)?;
 yield_arg: 'from' test | testlist;
+
 
 /*
  * lexer rules
@@ -469,7 +377,7 @@ NEWLINE: (
          this.skip();
        } else if (indent > previous) {
          this.indents.push(indent);
-         this.emit(this.commonToken(Python3Parser.INDENT, spaces));
+         this.emit(this.commonToken(Python3Parser.INDENT, "indent")); // Custom
        } else {
          // Possibly emit more than 1 DEDENT token.
          while (this.indents.length && this.indents[this.indents.length - 1] > indent) {
