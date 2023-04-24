@@ -9,14 +9,11 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx ts-node server.ts",
-    "antlr4ts-js": "antlr4 -o ./src/parser/languages/javascript/dist ./src/parser/languages/javascript/grammar/JavaScriptLexer.g4"
+    "start": "npx ts-node server.ts"
   },
   "author": "Wouter Beffes",
   "license": "MIT",
   "dependencies": {
-    "@types/antlr4": "^4.11.2",
-    "@types/unzip-stream": "^0.3.1",
     "antlr4ts": "^0.5.0-alpha.4",
     "babel-cli": "^6.26.0",
     "body-parser": "^1.20.2",
@@ -35,6 +32,8 @@
     "@types/md5": "^2.3.2",
     "@types/node": "^18.15.11",
     "@types/request-promise": "^4.1.48",
+    "@types/antlr4": "^4.11.2",
+    "@types/unzip-stream": "^0.3.1",
     "antlr4ts-cli": "^0.5.0-alpha.4",
     "express-winston": "^4.2.0",
     "winston": "^3.8.2"
