@@ -8,20 +8,16 @@ import fs from 'fs';
     const files = ["./test/a.js"]
     const test_dir = './test/'
     
-    function getFiles(dir: string) {
+    function getFiles(dir: string, acc: string[] = []): string[] {
         fs.readdirSync(dir).forEach((file: string) => {
             const abs_path = path.join(dir, file);
-            if (fs.statSync(abs_path).isDirectory()) return getFiles(abs_path);
-            else return files.push(abs_path);
+            if (fs.statSync(abs_path).isDirectory()) return getFiles(abs_path, acc);
+            else acc.push(abs_path);
         });
+        return acc
     }
-    
-    //getFiles(test_dir)
-    
-    
 
-    const parsed = await Parser.ParseFiles(files)
-
-    // console.log(parsed)
+    const parsed = await Parser.ParseFiles({files})
+    console.log(parsed.values())
 })()
 

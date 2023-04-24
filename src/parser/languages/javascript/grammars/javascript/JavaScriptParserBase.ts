@@ -1,28 +1,28 @@
-import antlr4 from 'antlr4';
-import JavaScriptParser from './JavaScriptParser.js';
+import antlr4ts from 'antlr4ts';
+import { JavaScriptParser } from '../../lib/JavaScriptParser.ts';
 
-export default class JavaScriptParserBase extends antlr4.Parser {
+export default abstract class JavaScriptParserBase extends antlr4ts.Parser {
 
-    constructor(input) {
+    constructor(input: antlr4ts.TokenStream) {
         super(input);
     }
 
-    p(str) {
+    p(str: any) {
         return this.prev(str);
     }
 
-    prev(str) {
+    prev(str: any) {
         return  this._input.LT(-1).text === str;
     }
 
     // Short form for next(String str)
-    n(str)
+    n(str: any)
     {
         return this.next(str);
     }
 
     // Whether the next token value equals to @param str
-    next(str)
+    next(str: any)
     {
         return  this._input.LT(1).text === str;
     }
@@ -43,27 +43,27 @@ export default class JavaScriptParserBase extends antlr4.Parser {
         return this._input.LT(1).type === JavaScriptParser.CloseBrace;
     }
 
-    here(type) {
-        const possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
+    here(type: any) {
+        const possibleIndexEosToken = this.currentToken.tokenIndex - 1;
         const ahead = this._input.get(possibleIndexEosToken);
-        return ahead.channel === antlr4.Lexer.HIDDEN && ahead.type === type;
+        return ahead.channel === antlr4ts.Lexer.HIDDEN && ahead.type === type;
     }
 
     lineTerminatorAhead() {
-        let possibleIndexEosToken = this.getCurrentToken().tokenIndex - 1;
+        let possibleIndexEosToken = this.currentToken.tokenIndex - 1;
         let ahead = this._input.get(possibleIndexEosToken);
-        if (ahead.channel !== antlr4.Lexer.HIDDEN) {
+        if (ahead.channel !== antlr4ts.Lexer.HIDDEN) {
             return false;
         }
         if (ahead.type === JavaScriptParser.LineTerminator) {
             return true;
         }
         if (ahead.type === JavaScriptParser.WhiteSpaces) {
-            possibleIndexEosToken = this.getCurrentToken().tokenIndex - 2;
+            possibleIndexEosToken = this.currentToken.tokenIndex - 2;
             ahead = this._input.get(possibleIndexEosToken);
         }
-        const text = ahead.text;
-        const type = ahead.type;
+        const text = ahead.text??'';
+        const type = ahead.type??'';
         return (
                 (type === JavaScriptParser.MultiLineComment &&
                  (text.includes("\r") || text.includes("\n"))) ||

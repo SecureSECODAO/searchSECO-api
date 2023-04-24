@@ -1,22 +1,27 @@
-import antlr4 from 'antlr4';
-import JavaScriptLexer from './JavaScriptLexer.js';
+import antlr4ts from 'antlr4ts';
+import { JavaScriptLexer } from '../../lib/JavaScriptLexer.ts';
 
-export default class JavaScriptLexerBase extends antlr4.Lexer {
+export default abstract class JavaScriptLexerBase extends antlr4ts.Lexer {
+    private scopeStrictModes = new Array();
+    private lastToken: antlr4ts.Token | null = null;
+    private useStrictDefault = false;
+    private useStrictCurrent = false;
+    private templateDepth = 0;
 
-    constructor(input) {
+    constructor(input: antlr4ts.CharStream) {
         super(input);
-        this.scopeStrictModes = new Array();
-        this.lastToken = null;
-        this.useStrictDefault = false;
-        this.useStrictCurrent = false;
-        this.templateDepth = 0;
+        // this.scopeStrictModes = new Array();
+        // this.lastToken = null;
+        // this.useStrictDefault = false;
+        // this.useStrictCurrent = false;
+        // this.templateDepth = 0;
     }
 
     getStrictDefault() {
         return this.useStrictDefault;
     }
 
-    setUseStrictDefault(value) {
+    setUseStrictDefault(value: boolean) {
         this.useStrictDefault = value;
         this.useStrictCurrent = value;
     }
@@ -36,7 +41,7 @@ export default class JavaScriptLexerBase extends antlr4.Lexer {
     nextToken() {
         var next = super.nextToken();
 
-        if (next.channel === antlr4.Token.DEFAULT_CHANNEL) {
+        if (next.channel === antlr4ts.Token.DEFAULT_CHANNEL) {
             this.lastToken = next;
         }
         return next;

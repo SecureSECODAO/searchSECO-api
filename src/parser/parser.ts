@@ -10,14 +10,25 @@ enum Language {
     JS
 }
 
+function getFiles(dir: string, acc: string[] = []): string[] {
+    fs.readdirSync(dir).forEach((file: string) => {
+        const abs_path = path.join(dir, file);
+        if (fs.statSync(abs_path).isDirectory()) return getFiles(abs_path, acc);
+        else acc.push(abs_path);
+    });
+    return acc
+}
+
 export default class Parser {
     static parsers: Map<Language, IParser> = new Map<Language, IParser>([
         [Language.JS, new Javascript()],
         [Language.PYTHON, new Python()]
     ]);
 
-    public static async ParseFiles(files: string[]): Promise<Map<string, HashData[]>[]> {
-        const result = [] as Map<string, HashData[]>[]
+
+    public static async ParseFiles({path, files}: {path?: string, files?: string[]}): Promise<Map<string, HashData[]>> {
+        if (!files) files = getFiles(path??'')
+        let result = new Map<string, HashData[]>()
         files.forEach(file => {
             const { filename, lang } = Parser.getFileName(file) ?? { filename: "" }
             if (!lang)
@@ -32,8 +43,8 @@ export default class Parser {
         })
 
         await Promise.all([...this.parsers.values()].map(async p => {
-            const data = await p.Parse()
-            result.push(data)
+            const content = await p.Parse()
+            result = new Map([...result, ...content])
         }))
     
         return result
