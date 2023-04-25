@@ -13,8 +13,8 @@ Currently there are two endpoints exposed.
 ```
 {
   "url": <github_url>,
-  "token: <github_token>,
-  "wallet: <wallet_address>
+  "token": <github_token>,
+  "wallet": <wallet_address>
 }
 ```
 The response of this endpoint has the following structure:
