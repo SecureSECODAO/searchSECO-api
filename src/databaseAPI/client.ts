@@ -2,8 +2,6 @@ import { Socket } from 'net'
 import { ResponseDecoderFactory, TCPResponse } from './Response.ts'
 import { RequestType, TCPRequest, RequestFactory } from './Request.ts'
 
-export type Host = string
-export type Port = number
 
 /**
  * The TCP Client interface
@@ -19,8 +17,8 @@ export interface ITCPClient {
 }
 
 export class TCPClient implements ITCPClient {
-    private readonly _port: Port = -1
-    private readonly _host: Host = ''
+    private readonly _port: number = -1
+    private readonly _host: string = ''
     private readonly _clientName: string
     private readonly _client: Socket
     private _request: TCPRequest | undefined = undefined
@@ -29,16 +27,15 @@ export class TCPClient implements ITCPClient {
     private _response: TCPResponse = undefined
     private _error: Error | undefined = undefined
 
-    constructor(clientName: string, port: Port, host: Host) {
+    constructor(clientName: string, port: number | string, host: string) {
         this._clientName = clientName
-        this._port = port
+        this._port = typeof(port) == 'number' ? port : parseInt(port)
         this._host = host
 
         this._client = new Socket()
 
         this._client.on('connect', () => {
             console.log(`Connected to ${this._host}:${this._port}`)
-            console.log(`Local port: ${this._client.localPort}`)
         })
         this._client.on('error', (err: Error) => {
             this._error = err
@@ -55,6 +52,8 @@ export class TCPClient implements ITCPClient {
                 requestType: type,
                 response: decoder.Decode(rawResponse.filter((r: string) => r !== ''))
             }
+
+            console.log(`Fetching ${this._response.response.length} items...`)
 
             this._client.destroy()
         })

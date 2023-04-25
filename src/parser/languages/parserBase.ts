@@ -49,7 +49,7 @@ export abstract class ParserBase implements IParser {
 
         return Promise.resolve().then(async () => {
             while (this.buffer.length > 0) {
-                const {filename, data} = this.buffer.pop() ?? { filename: "", data: "" }
+                const {filename, data} = this.buffer.pop() || { filename: "", data: "" }
                 result.set(filename, this.parseSingle(data, filename))
             }
             // this.clear()

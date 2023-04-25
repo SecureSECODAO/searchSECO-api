@@ -24,8 +24,8 @@ export default class JSListener implements JavaScriptParserListener {
     protected inNonAbsoluteFunctionDef: boolean
 
     constructor(tsr: TokenStreamRewriter, filename: string, minMethodSize: number, minFunctionChars: number) {
-        this.minMethodSize = minMethodSize ?? 0
-        this.minFunctionChars = minFunctionChars ?? 0
+        this.minMethodSize = minMethodSize || 0
+        this.minFunctionChars = minFunctionChars || 0
 
         this.baseTSR = tsr
         this.filename = filename
@@ -50,18 +50,18 @@ export default class JSListener implements JavaScriptParserListener {
     }
 
     exitAnonymousFunctionDecl(ctx: AnonymousFunctionDeclContext) {
-        const functionName = this.functionNames.pop() ?? ''
-        const functionBody = (this.functionBodies.pop()??'').replace(/\s+/gm, '')
+        const functionName = this.functionNames.pop() || ''
+        const functionBody = (this.functionBodies.pop() || '').replace(/\s+/gm, '')
 
-        const start = this.starts.pop() ?? 0
-        const stop = ctx.stop?.line ?? 0
+        const start = this.starts.pop() || 0
+        const stop = ctx.stop?.line || 0
 
         if (stop - start >= this.minMethodSize)
             this.output.push(new HashData(md5(functionBody), this.filename, functionName, start, stop))
 
         this.tsrs.pop()
         if (this.tsrs.length > 0) {
-            this.tsrs[this.tsrs.length-1].replace(ctx.start.tokenIndex, ctx.stop?.tokenIndex??0, "var")
+            this.tsrs[this.tsrs.length-1].replace(ctx.start.tokenIndex, ctx.stop?.tokenIndex||0, "var")
         }
     }
 
@@ -76,11 +76,11 @@ export default class JSListener implements JavaScriptParserListener {
     }
 
     exitFunctionDeclaration(ctx: FunctionDeclarationContext) {
-        const functionName = this.functionNames.pop() ?? ''
-        const functionBody = (this.functionBodies.pop()??'').replace(/\s+/gm, '')
+        const functionName = this.functionNames.pop() || ''
+        const functionBody = (this.functionBodies.pop() ||'').replace(/\s+/gm, '')
 
-        const start = this.starts.pop() ?? 0
-        const stop = ctx.stop?.line ?? 0
+        const start = this.starts.pop() || 0
+        const stop = ctx.stop?.line || 0
 
         if (stop - start >= this.minMethodSize) {
             const hashData = new HashData(md5(functionBody), this.filename, functionName, start, stop)
@@ -89,7 +89,7 @@ export default class JSListener implements JavaScriptParserListener {
 
         this.tsrs.pop()
         if (this.tsrs.length > 0) {
-            this.tsrs[this.tsrs.length-1].replace(ctx.start.tokenIndex, ctx.stop?.tokenIndex??0, "var")
+            this.tsrs[this.tsrs.length-1].replace(ctx.start.tokenIndex, ctx.stop?.tokenIndex || 0, "var")
         }
     }
 
@@ -105,9 +105,9 @@ export default class JSListener implements JavaScriptParserListener {
     }
 
     enterIdentifier(ctx: IdentifierContext) {
-        const name = this.functionNames.pop()??''
+        const name = this.functionNames.pop() || ''
         if (this.inNonAbsoluteFunctionDef && !name) {
-            this.functionNames.push(ctx.start.text??'')
+            this.functionNames.push(ctx.start.text||'')
         }
 
         if (name)

@@ -1,10 +1,10 @@
 import express from 'express'
 import bodyParser from 'body-parser';
-import { GithubInterface, sleep } from './src/GithubInterface.ts';
+import { GithubInterface } from './src/GithubInterface.ts';
 import { TCPClient } from './src/databaseAPI/Client.ts';
 import Parser from './src/parser/Parser.ts';
-import fs from 'fs'
 import { RequestType } from './src/databaseAPI/Request.ts';
+import logger from 'morgan'
 import j from 'joi';
 
 
@@ -30,6 +30,7 @@ const checkSchema = j.object().keys({
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(logger('dev'))
 
 app.post('/fetch', async (req: any, res: any) => {
     res.setHeader('Content-Type', 'application/json')
@@ -54,7 +55,7 @@ app.post('/fetch', async (req: any, res: any) => {
 
     }
     catch (e: any) {
-        res.status(e.status ?? 500)
+        res.status(e.status || 500)
         res.end(JSON.stringify(e))
     }
 })
@@ -66,12 +67,12 @@ app.post('/check', async (req, res) => {
 
     const { body: { hashes } } = validated.value
 
-    const tcpClient = new TCPClient('dao', parseInt(process.env.db_port??'8003'), process.env.db_host??'127.0.0.1')
+    const tcpClient = new TCPClient('dao', process.env.DB_PORT || 8003, process.env.DB_HOST || '127.0.0.1')
     const response = await tcpClient.Fetch(RequestType.CHECK, hashes)
     res.end(JSON.stringify(response))
 })
 
-const server = app.listen({ port: 8080 })
+const server = app.listen({ port: process.env.PORT || 8080 })
 
 const addr = server.address();
 const binding = typeof addr === 'string'

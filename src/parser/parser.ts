@@ -41,7 +41,7 @@ function getFileNameAndLanguage(filepath: string): {filename: string, lang: Lang
     switch (filename?.split('.').pop()) {
         case "py": return {filename, lang: Language.PYTHON} 
         case "js": return {filename, lang: Language.JS} 
-        default: return {filename: filename ?? '', lang: undefined}
+        default: return {filename: filename || '', lang: undefined}
     }
 }
 
