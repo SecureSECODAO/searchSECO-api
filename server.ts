@@ -14,16 +14,16 @@ const fetchSchema = j.object().keys({
     body: j.object().keys({
         url: j.string().required(),
         token: j.string().required(),
-        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/g)//.required()
+        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/)//.required()
     }).unknown().required()
 }).unknown()
 
-// Validat the request body for the Check request
+// Validate the request body for the Check request
 // The body must contain an array of valid MD5 hashes and a valid ETH wallet address
 const checkSchema = j.object().keys({
     body: j.object().keys({
         hashes: j.array().items(j.string().regex(/^[a-fA-F0-9]{32}$/i)).required(),
-        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/g)//.required()
+        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/)//.required()
     }).unknown().required()
 }).unknown()
 
