@@ -10,7 +10,6 @@ export async function sleep(ms: number) {
 
 const baseUrl = 'https://api.github.com'
 
-
 /**
  * This is the Github interface the API uses to download repositories.
  * @param token The Github Access token
@@ -70,7 +69,10 @@ export class GithubInterface {
             const { name, owner: { login }, default_branch: ref } = await this.fetchRepo(owner, repo)
             
             const dirName =  `${login}-${name}-${ref}`
-            const targetPath = `./.temp/${dirName}`
+            const targetPath = `.tmp/${dirName}`
+
+            if (!fs.existsSync('.tmp'))
+                fs.mkdirSync('.tmp')
 
             if (fs.existsSync(targetPath))
                 return dirName
@@ -108,12 +110,12 @@ export class GithubInterface {
         let zip_removed = false
         let dir_removed = false
     
-        fs.unlink(`./.temp/${dirName}.zip`, (err) => {
+        fs.unlink(`.tmp/${dirName}.zip`, (err) => {
             if (err) throw err
             zip_removed = true
         })
     
-        fs.rm(`./.temp/${dirName}`, { recursive: true, force: true }, (err) => {
+        fs.rm(`.tmp/${dirName}`, { recursive: true, force: true }, (err) => {
             if (err) throw err
             dir_removed = true
         })

@@ -5,7 +5,7 @@ import Python from "./languages/python3/PythonParser.ts";
 import * as fs from 'fs'
 import path from 'path'
 
-const baseDir = '.temp'
+const baseDir = '.tmp'
 
 enum Language {
     PYTHON = 1,
