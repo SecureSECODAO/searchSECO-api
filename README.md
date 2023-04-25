@@ -13,7 +13,8 @@ Currently there are two endpoints exposed.
 ```
 {
   "url": <github_url>,
-  "token: <github_token>
+  "token: <github_token>,
+  "wallet: <wallet_address>
 }
 ```
 The response of this endpoint has the following structure:
@@ -33,7 +34,8 @@ The response of this endpoint has the following structure:
 - `/check`: This is a `POST` request checking an array of hashes against the database. The request body looks as follows:
 ```
 {
-  "hashes": [ ]
+  "hashes": [ ... ],
+  "wallet": <wallet_address>
 }
 ```
 The response of this endpoint has the following structure:
