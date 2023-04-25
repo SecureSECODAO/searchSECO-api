@@ -1,4 +1,4 @@
-import HashData from "../../utils/HashData.ts";
+import HashData from "../../HashData.ts";
 import { ParserBase } from "../parserBase.ts";
 import antlr4ts from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker.js'
@@ -6,8 +6,10 @@ import { Python3Lexer } from "./lib/Python3Lexer.ts";
 import { Python3Parser } from "./lib/Python3Parser.ts"
 import Python3Listener from "./lib/Python3ListenerDerived.ts";
 
-
-export default class Javascript extends ParserBase {
+/**
+ * The implementation of a Python3 parser. This parser inherits from `ParserBase`.
+ */
+export default class Python extends ParserBase {
     protected override parseSingle(data: string, filename: string): HashData[] {
         const chars = new antlr4ts.ANTLRInputStream(data)
         const lexer = new Python3Lexer(chars)
@@ -25,9 +27,7 @@ export default class Javascript extends ParserBase {
 
         ParseTreeWalker.DEFAULT.walk(listener, tree)
 
-        const output: HashData[] = listener.GetData()
-
-        return output
+        return listener.GetData()
     }
 }
 

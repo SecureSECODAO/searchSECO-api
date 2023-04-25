@@ -1,4 +1,4 @@
-import HashData from "../../utils/HashData.ts";
+import HashData from "../../HashData.ts";
 import { ParserBase } from "../parserBase.ts";
 import antlr4ts from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker.js'
@@ -7,6 +7,9 @@ import { JavaScriptParser } from "./lib/JavaScriptParser.ts"
 import JSListener from "./lib/JavaScriptParserListenerDerived.ts";
 
 
+/**
+ * The implementation of a Javascript parser. This parser inherits from `ParserBase`.
+ */
 export default class Javascript extends ParserBase {
     protected override parseSingle(data: string, filename: string): HashData[] {
         const chars = new antlr4ts.ANTLRInputStream(data)
@@ -24,9 +27,7 @@ export default class Javascript extends ParserBase {
 
         ParseTreeWalker.DEFAULT.walk(listener, tree)
 
-        const output: HashData[] = listener.GetData()
-
-        return output
+        return listener.GetData()
     }
 }
 

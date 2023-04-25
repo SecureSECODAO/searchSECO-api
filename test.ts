@@ -1,4 +1,5 @@
 import Parser from './src/parser/parser.ts'
+import { GithubInterface } from './src/GithubInterface.ts';
 import antlr4 from 'antlr4';
 import path from 'path';
 import fs from 'fs';
@@ -17,7 +18,10 @@ import fs from 'fs';
         return acc
     }
 
-    const { filenames, result } = await Parser.ParseFiles({ path: test_dir })
+    const githubInterface = new GithubInterface(process.env.github_token??'')
+
+    const dirName = await githubInterface.DownloadRepository("https://github.com/i-voted-for-trump/is-odd")
+    const { filenames, result } = await Parser.ParseFiles({ path: dirName })
     console.log(result.values())
 })()
 

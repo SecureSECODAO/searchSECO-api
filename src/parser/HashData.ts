@@ -1,6 +1,8 @@
 
-
-class HashData {
+/**
+ * The HashData object to store data about parsed functions.
+ */
+export default class HashData {
     public Hash: string
     public FileName: string
     public FunctionName: string
@@ -15,5 +17,3 @@ class HashData {
         this.LineNumberEnd = lineNumberEnd ?? -1
     }
 }
-
-export default HashData

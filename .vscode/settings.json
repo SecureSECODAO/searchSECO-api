@@ -3,5 +3,6 @@
     "files.associations": {
         "sstream": "cpp",
         "new": "cpp"
-    }
+    },
+    "cmake.sourceDirectory": "C:/Users/woute/repos/searchSECO-api/modules/SearchSECOSpider/libSearchSECOSpider"
 }

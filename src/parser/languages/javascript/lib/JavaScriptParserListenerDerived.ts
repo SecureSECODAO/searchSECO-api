@@ -1,6 +1,6 @@
 import { JavaScriptParserListener } from "./JavaScriptParserListener.ts";
 import md5 from 'md5'
-import HashData from "../../../utils/HashData.ts";
+import HashData from "../../../HashData.ts";
 import { TokenStreamRewriter } from "antlr4ts";
 import Interval from "antlr4/misc/Interval";
 import { 
