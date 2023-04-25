@@ -1,5 +1,5 @@
 import HashData from "./HashData.ts";
-import { IParser } from "./languages/parserBase.ts";
+import { IParser } from "./languages/ParserBase.ts";
 import Javascript from "./languages/javascript/JavascriptParser.ts";
 import Python from "./languages/python3/PythonParser.ts";
 import * as fs from 'fs'

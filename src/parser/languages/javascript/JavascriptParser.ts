@@ -1,5 +1,5 @@
 import HashData from "../../HashData.ts";
-import { ParserBase } from "../parserBase.ts";
+import { ParserBase } from "../ParserBase.ts";
 import antlr4ts from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker.js'
 import { JavaScriptLexer } from "./lib/JavaScriptLexer.ts";

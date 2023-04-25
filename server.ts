@@ -1,10 +1,10 @@
 import express from 'express'
 import bodyParser from 'body-parser';
 import { GithubInterface, sleep } from './src/GithubInterface.ts';
-import { TCPClient } from './src/databaseAPI/client.ts';
-import Parser from './src/parser/parser.ts';
+import { TCPClient } from './src/databaseAPI/Client.ts';
+import Parser from './src/parser/Parser.ts';
 import fs from 'fs'
-import { RequestType } from './src/databaseAPI/request.ts';
+import { RequestType } from './src/databaseAPI/Request.ts';
 import j from 'joi';
 
 
@@ -14,7 +14,7 @@ const fetchSchema = j.object().keys({
     body: j.object().keys({
         url: j.string().required(),
         token: j.string().required(),
-        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/g).required()
+        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/g)//.required()
     }).unknown().required()
 }).unknown()
 
@@ -23,28 +23,9 @@ const fetchSchema = j.object().keys({
 const checkSchema = j.object().keys({
     body: j.object().keys({
         hashes: j.array().items(j.string().regex(/^[a-fA-F0-9]{32}$/i)).required(),
-        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/g).required()
+        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/g)//.required()
     }).unknown().required()
 }).unknown()
-
-
-async function clearCache(dirName: string) {
-    let zip_removed = false
-    let dir_removed = false
-
-    fs.unlink(`./.temp/${dirName}.zip`, (err) => {
-        if (err) throw err
-        zip_removed = true
-    })
-
-    fs.rm(`./.temp/${dirName}`, { recursive: true, force: true }, (err) => {
-        if (err) throw err
-        dir_removed = true
-    })
-
-    while (!zip_removed && dir_removed)
-        await sleep(500)
-}
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -67,7 +48,7 @@ app.post('/fetch', async (req: any, res: any) => {
 
         const { filenames, result } = await Parser.ParseFiles({ path: dirName })
 
-        await clearCache(dirName)
+        await GithubInterface.ClearCache(dirName)
 
         res.end(JSON.stringify(Object.fromEntries(result)))
 

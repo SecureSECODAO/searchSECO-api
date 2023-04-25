@@ -1,12 +1,20 @@
 import { Socket } from 'net'
-import { ResponseDecoderFactory, TCPResponse } from './response.ts'
-import { RequestType, TCPRequest, RequestFactory } from './request.ts'
+import { ResponseDecoderFactory, TCPResponse } from './Response.ts'
+import { RequestType, TCPRequest, RequestFactory } from './Request.ts'
 
 export type Host = string
 export type Port = number
 
-
+/**
+ * The TCP Client interface
+ */
 export interface ITCPClient {
+    /**
+     * Fetches a response from the database API. 
+     * @param requestType The request type to fetch
+     * @param data The data to be used when processing the request
+     * @returns A promise which resolves to a `TCPResponse` when the request is handled.
+     */
     Fetch(requestType: RequestType, data: string[]): Promise<TCPResponse>
 }
 

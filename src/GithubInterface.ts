@@ -99,6 +99,28 @@ export class GithubInterface {
             return undefined
         }
     }
+
+    /**
+     * Removes a specific directory from the cache
+     * @param dirName The directory to remove
+     */
+    public static async ClearCache(dirName: string) {
+        let zip_removed = false
+        let dir_removed = false
+    
+        fs.unlink(`./.temp/${dirName}.zip`, (err) => {
+            if (err) throw err
+            zip_removed = true
+        })
+    
+        fs.rm(`./.temp/${dirName}`, { recursive: true, force: true }, (err) => {
+            if (err) throw err
+            dir_removed = true
+        })
+    
+        while (!zip_removed && dir_removed)
+            await sleep(500)
+    }
 }
 
 

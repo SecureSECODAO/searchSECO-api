@@ -1,4 +1,4 @@
-import { RequestType } from './request.ts'
+import { RequestType } from './Request.ts'
 
 export type ResponseData = {}
 export type CheckResponseData = ResponseData & {
