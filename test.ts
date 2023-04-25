@@ -6,7 +6,7 @@ import fs from 'fs';
 
 
 (async () => {
-    const githubInterface = new GithubInterface(process.env.github_token??'')
+    const githubInterface = new GithubInterface(process.env.GITHUB_TOKEN || '')
 
     const dirName = await githubInterface.DownloadRepository("https://github.com/i-voted-for-trump/is-odd")
 

@@ -41,11 +41,11 @@ export default class P3Listener implements Python3Listener {
     }
 
     exitFuncdef(ctx: FuncdefContext) {
-        const functionName = this.functionNames.pop() ?? ''
-        const functionBody = (this.functionBodies.pop()??'').replace(/\s+/gm, '')
+        const functionName = this.functionNames.pop() || ''
+        const functionBody = (this.functionBodies.pop() || '').replace(/\s+/gm, '')
 
-        const start = this.starts.pop() ?? 0
-        const stop = ctx.stop?.line ?? 0
+        const start = this.starts.pop() || 0
+        const stop = ctx.stop?.line || 0
 
         if (stop - start >= this.minMethodSize) {
             const hashData = new HashData(md5(functionBody), this.filename, functionName, start, stop)
@@ -56,7 +56,7 @@ export default class P3Listener implements Python3Listener {
 
         this.tsrs.pop()
         if (this.tsrs.length > 0) {
-            this.tsrs[this.tsrs.length-1].replace(ctx.start.tokenIndex, ctx.stop?.tokenIndex??0, "")
+            this.tsrs[this.tsrs.length-1].replace(ctx.start.tokenIndex, ctx.stop?.tokenIndex || 0, "")
         }
     }
 
@@ -73,9 +73,9 @@ export default class P3Listener implements Python3Listener {
 
     enterName(ctx: NameContext) {
         if (this.tsrs.length > 0) {
-            const name = this.functionNames.pop()??''
+            const name = this.functionNames.pop() || ''
             if (!name) {
-                this.functionNames.push(ctx.start.text??'')
+                this.functionNames.push(ctx.start.text || '')
             }
     
             if (this.inFunction)
