@@ -10,7 +10,7 @@ const baseDir = '.tmp'
 enum Language {
     PYTHON = 1,
     JS
-}2
+}
 
 /** 
  * Recursively retrieves file paths from all nested subdirectories in a root dir.
