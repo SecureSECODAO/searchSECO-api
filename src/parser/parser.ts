@@ -10,7 +10,7 @@ const baseDir = '.tmp'
 enum Language {
     PYTHON = 1,
     JS
-}2
+}
 
 /** 
  * Recursively retrieves file paths from all nested subdirectories in a root dir.
@@ -47,9 +47,8 @@ function getFileNameAndLanguage(filepath: string): {filename: string, lang: Lang
 
 /**
  * The Javascript implementation of the SearchSECO parser. 
- * For efficiency, this parser is a static class that holds static references to the individual language parsers.
+ * For efficiency, this parser is a static class that holds references to the individual language parsers.
  */
-
 export default class Parser {
     static parsers: Map<Language, IParser> = new Map<Language, IParser>([
         [Language.JS, new Javascript()],
@@ -64,8 +63,8 @@ export default class Parser {
      * and the values are HashData objects containing data about the parsed functions.
      */
     public static async ParseFiles({path, files}: {path?: string, files?: string[]}): Promise<{filenames: string[], result: Map<string, HashData[]>}> {
-        if (!files) files = getFiles(`${baseDir}/${path}`)
-        const filenames = [] as string[]
+        files ??= getFiles(`${baseDir}/${path}`)
+        const filenames: string[] = []
         let result = new Map<string, HashData[]>()
         files.forEach(file => {
             const { filename, lang } = getFileNameAndLanguage(file)

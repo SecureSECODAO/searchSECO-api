@@ -25,7 +25,7 @@ export class TCPClient implements ITCPClient {
     private _requestProcessed: boolean = false
     private _busy: boolean = false
     private _response: TCPResponse = undefined
-    private _error: Error | undefined = undefined
+    private _error: any | undefined = undefined
 
     constructor(clientName: string, port: number | string, host: string) {
         this._clientName = clientName
@@ -37,7 +37,7 @@ export class TCPClient implements ITCPClient {
         this._client.on('connect', () => {
             console.log(`Connected to ${this._host}:${this._port}`)
         })
-        this._client.on('error', (err: Error) => {
+        this._client.on('error', (err: any) => {
             this._error = err
         })
         this._client.on('data', (data: any) => {
@@ -46,15 +46,14 @@ export class TCPClient implements ITCPClient {
 
             this._requestProcessed = true
             this._busy = false
+
             const decoder = ResponseDecoderFactory.GetDecoder(type)
             this._response = {
                 responseCode: parseInt(code),
                 requestType: type,
                 response: decoder.Decode(rawResponse.filter((r: string) => r !== ''))
             }
-
-            console.log(`Fetching ${this._response.response.length} items...`)
-
+            console.log("Done!")
             this._client.destroy()
         })
         this._client.on('close', () => {
@@ -67,6 +66,8 @@ export class TCPClient implements ITCPClient {
     }
 
     public async Fetch(type: RequestType, data: string[]): Promise<TCPResponse> {
+        console.log(`Fetching ${data.length} items...`)
+
         while (this._busy)
             await new Promise(resolve => setTimeout(resolve, 500))
         this._busy = true
