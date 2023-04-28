@@ -1,10 +1,10 @@
-import HashData from "../../HashData.ts";
-import { ParserBase } from "../ParserBase.ts";
+import HashData from "../../HashData";
+import { ParserBase } from "../ParserBase";
 import antlr4ts from 'antlr4ts';
-import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker.js'
-import { JavaScriptLexer } from "./lib/JavaScriptLexer.ts";
-import { JavaScriptParser } from "./lib/JavaScriptParser.ts"
-import JSListener from "./lib/JavaScriptParserListenerDerived.ts";
+import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker'
+import { JavaScriptLexer } from "./lib/JavaScriptLexer";
+import { JavaScriptParser } from "./lib/JavaScriptParser"
+import JSListener from "./lib/JavaScriptParserListenerDerived";
 
 
 /**

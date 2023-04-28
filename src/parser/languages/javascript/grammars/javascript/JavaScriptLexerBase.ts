@@ -1,5 +1,5 @@
 import antlr4ts from 'antlr4ts';
-import { JavaScriptLexer } from '../../lib/JavaScriptLexer.ts';
+import { JavaScriptLexer } from '../../lib/JavaScriptLexer';
 
 export default abstract class JavaScriptLexerBase extends antlr4ts.Lexer {
     private scopeStrictModes = new Array();

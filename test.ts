@@ -1,5 +1,5 @@
-import Parser from './src/parser/Parser.ts'
-import { GithubInterface } from './src/GithubInterface.ts';
+import Parser from './src/parser/Parser'
+import { GithubInterface } from './src/GithubInterface';
 import antlr4 from 'antlr4';
 import path from 'path';
 import fs from 'fs';

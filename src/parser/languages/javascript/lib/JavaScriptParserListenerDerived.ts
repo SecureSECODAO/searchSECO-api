@@ -1,6 +1,6 @@
-import { JavaScriptParserListener } from "./JavaScriptParserListener.ts";
+import { JavaScriptParserListener } from "./JavaScriptParserListener";
 import md5 from 'md5'
-import HashData from "../../../HashData.ts";
+import HashData from "../../../HashData";
 import { TokenStreamRewriter } from "antlr4ts";
 import Interval from "antlr4/misc/Interval";
 import { 
@@ -8,7 +8,7 @@ import {
     FunctionBodyContext, 
     FunctionDeclarationContext, 
     IdentifierContext } 
-    from "./JavaScriptParser.ts";
+    from "./JavaScriptParser";
 
 export default class JSListener implements JavaScriptParserListener {
     protected minMethodSize: number

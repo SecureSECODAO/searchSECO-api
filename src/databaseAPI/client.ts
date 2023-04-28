@@ -1,6 +1,6 @@
 import { Socket } from 'net'
-import { ResponseDecoderFactory, TCPResponse } from './Response.ts'
-import { RequestType, TCPRequest, RequestFactory } from './Request.ts'
+import { ResponseDecoderFactory, TCPResponse } from './Response'
+import { RequestType, TCPRequest, RequestFactory } from './Request'
 
 
 /**

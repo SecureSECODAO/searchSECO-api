@@ -1,5 +1,5 @@
 import antlr4ts from 'antlr4ts';
-import { JavaScriptParser } from '../../lib/JavaScriptParser.ts';
+import { JavaScriptParser } from '../../lib/JavaScriptParser';
 
 export default abstract class JavaScriptParserBase extends antlr4ts.Parser {
 

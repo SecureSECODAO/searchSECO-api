@@ -1,7 +1,7 @@
-import HashData from "./HashData.ts";
-import { IParser } from "./languages/ParserBase.ts";
-import Javascript from "./languages/javascript/JavascriptParser.ts";
-import Python from "./languages/python3/PythonParser.ts";
+import HashData from "./HashData";
+import { IParser } from "./languages/ParserBase";
+import Javascript from "./languages/javascript/JavascriptParser";
+import Python from "./languages/python3/PythonParser";
 import * as fs from 'fs'
 import path from 'path'
 
