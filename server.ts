@@ -1,9 +1,9 @@
 import express from 'express'
 import bodyParser from 'body-parser';
-import { GithubInterface } from './src/GithubInterface.ts';
-import { TCPClient } from './src/databaseAPI/Client.ts';
-import Parser from './src/parser/Parser.ts';
-import { RequestType } from './src/databaseAPI/Request.ts';
+import { GithubInterface } from './src/GithubInterface';
+import { TCPClient } from './src/databaseAPI/Client';
+import Parser from './src/parser/Parser';
+import { RequestType } from './src/databaseAPI/Request';
 import logger from 'morgan'
 import j from 'joi';
 
