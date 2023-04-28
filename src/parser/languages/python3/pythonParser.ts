@@ -1,10 +1,10 @@
-import HashData from "../../HashData.ts";
-import { ParserBase } from "../ParserBase.ts";
+import HashData from "../../HashData";
+import { ParserBase } from "../ParserBase";
 import antlr4ts from 'antlr4ts';
-import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker.js'
-import { Python3Lexer } from "./lib/Python3Lexer.ts";
-import { Python3Parser } from "./lib/Python3Parser.ts"
-import Python3Listener from "./lib/Python3ListenerDerived.ts";
+import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker'
+import { Python3Lexer } from "./lib/Python3Lexer";
+import { Python3Parser } from "./lib/Python3Parser"
+import Python3Listener from "./lib/Python3ListenerDerived";
 
 /**
  * The implementation of a Python3 parser. This parser inherits from `ParserBase`.

@@ -1,23 +1,23 @@
 // Generated from ./src/parser/languages/python3/grammars/Python3.g4 by ANTLR 4.9.0-SNAPSHOT
 
 
-  import { Token } from 'antlr4ts/Token.js';
-  import { CommonToken } from 'antlr4ts/CommonToken.js';
-  import { Python3Parser } from './Python3Parser.ts';
+  import { Token } from 'antlr4ts/Token';
+  import { CommonToken } from 'antlr4ts/CommonToken';
+  import { Python3Parser } from './Python3Parser';
 
 
-import { ATN } from "antlr4ts/atn/ATN.js";
-import { ATNDeserializer } from "antlr4ts/atn/ATNDeserializer.js";
-import { CharStream } from "antlr4ts/CharStream.js";
-import { Lexer } from "antlr4ts/Lexer.js";
-import { LexerATNSimulator } from "antlr4ts/atn/LexerATNSimulator.js";
-import { NotNull } from "antlr4ts/Decorators.js";
-import { Override } from "antlr4ts/Decorators.js";
-import { RuleContext } from "antlr4ts/RuleContext.js";
-import { Vocabulary } from "antlr4ts/Vocabulary.js";
-import { VocabularyImpl } from "antlr4ts/VocabularyImpl.js";
+import { ATN } from "antlr4ts/atn/ATN";
+import { ATNDeserializer } from "antlr4ts/atn/ATNDeserializer";
+import { CharStream } from "antlr4ts/CharStream";
+import { Lexer } from "antlr4ts/Lexer";
+import { LexerATNSimulator } from "antlr4ts/atn/LexerATNSimulator";
+import { NotNull } from "antlr4ts/Decorators";
+import { Override } from "antlr4ts/Decorators";
+import { RuleContext } from "antlr4ts/RuleContext";
+import { Vocabulary } from "antlr4ts/Vocabulary";
+import { VocabularyImpl } from "antlr4ts/VocabularyImpl";
 
-import * as Utils from "antlr4ts/misc/Utils.js";
+import * as Utils from "antlr4ts/misc/Utils";
 
 
 export class Python3Lexer extends Lexer {
