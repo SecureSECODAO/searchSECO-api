@@ -1,6 +1,7 @@
 import { Socket } from 'net'
-import { ResponseDecoderFactory, TCPResponse } from './Response'
-import { RequestType, TCPRequest, RequestFactory } from './Request'
+import { AuthorResponseData, CheckResponseData, ResponseData, ResponseDecoder, TCPResponse } from './Response'
+import { RequestType, TCPRequest, RequestGenerator } from './Request'
+import { Command, RequestMapping } from '../controller/Command'
 
 
 /**
@@ -24,7 +25,7 @@ export class TCPClient implements ITCPClient {
     private _request: TCPRequest | undefined = undefined
     private _requestProcessed: boolean = false
     private _busy: boolean = false
-    private _response: TCPResponse = undefined
+    private _response: TCPResponse | undefined = undefined
     private _error: any | undefined = undefined
 
     constructor(clientName: string, port: number | string, host: string) {
@@ -47,12 +48,13 @@ export class TCPClient implements ITCPClient {
             this._requestProcessed = true
             this._busy = false
 
-            const decoder = ResponseDecoderFactory.GetDecoder(type)
-            this._response = {
-                responseCode: parseInt(code),
-                requestType: type,
-                response: decoder.Decode(rawResponse.filter((r: string) => r !== ''))
-            }
+            const decoder = new ResponseDecoder(ResponseDecoder.GetResponseTemplate(type))
+
+            this._response = new TCPResponse(
+                parseInt(code),
+                type,
+                decoder.Decode(rawResponse.filter((r: string) => r !== ''))
+            )
             console.log("Done!")
             this._client.destroy()
         })
@@ -65,16 +67,44 @@ export class TCPClient implements ITCPClient {
         this._client.connect(this._port, this._host)
     }
 
+    /**
+     * This is a basic implementation of the "Check" command that is normally issued by the controller.
+     * In the future this function will become more generic.
+     * @param data The hashes to check against the database
+     */
+    public async Check(hashes: string[]): Promise<TCPResponse[]> {
+        const responses: TCPResponse[] = []
+
+        const checkResponse = await this.Fetch(RequestType.CHECK, hashes)
+        responses.push(checkResponse)
+
+        const authors = Array.from(new Set(checkResponse.response.map((r: CheckResponseData) => r.authorIds).reduce((acc: string[], val: string[]) => acc.concat(val), [])))
+        const authorResponse = await this.Fetch(RequestType.GET_AUTHOR, authors)
+        responses.push(authorResponse)
+
+        const uniqueVersions = new Set<string>() 
+        checkResponse.response.forEach((r: CheckResponseData) => {
+            uniqueVersions.add(`${r.projectID}?${r.startVersion}`)
+            uniqueVersions.add(`${r.projectID}?${r.endVersion}`)
+        })
+        const versionResponse = await this.Fetch(RequestType.EXTRACT_PROJECTS, Array.from(uniqueVersions))
+        responses.push(versionResponse)
+
+        return responses
+    }
+
     public async Fetch(type: RequestType, data: string[]): Promise<TCPResponse> {
         console.log(`Fetching ${data.length} items...`)
 
         while (this._busy)
             await new Promise(resolve => setTimeout(resolve, 500))
+
         this._busy = true
         this._connect()
+
         this._requestProcessed = false
-        const requestGenerator = RequestFactory.GetRequestGenerator(type)
-        this._request = requestGenerator.Generate(type, this._clientName, data)
+        
+        this._request = RequestGenerator.Generate(type, this._clientName, data)
 
         this._request.body.forEach(request => this._sendData(request))
 
@@ -83,7 +113,7 @@ export class TCPClient implements ITCPClient {
         }
         if (this._error)
             throw this._error
-        return this._response
+        return this._response || new TCPResponse(500, RequestType.UNDEFINED, [])
     }
 
     private _sendData(request: string) {

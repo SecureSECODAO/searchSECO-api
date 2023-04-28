@@ -1,8 +1,11 @@
 import Parser from './src/parser/Parser'
-import { GithubInterface } from './src/GithubInterface';
+import { GithubInterface } from './src/spider/GithubInterface';
 import antlr4 from 'antlr4';
 import path from 'path';
 import fs from 'fs';
+import HashData from './src/utils/HashData';
+import { TCPClient } from './src/databaseAPI/Client';
+import { RequestType } from './src/databaseAPI/Request';
 
 
 (async () => {
@@ -16,9 +19,14 @@ import fs from 'fs';
     }
 
     const { filenames, result } = await Parser.ParseFiles({ path: dirName })
-    
+
     await GithubInterface.ClearCache(dirName)
 
-    console.log(result.values())
+    const hashes = result.map((r: HashData) => r.Hash)
+
+    const client = new TCPClient("dao", 8003, "127.0.0.1")
+    const response = await client.Check(hashes)
+
+    console.log(JSON.stringify(response))
 })()
 

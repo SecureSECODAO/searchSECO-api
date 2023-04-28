@@ -1,4 +1,4 @@
-import HashData from "./HashData";
+import HashData from "../utils/HashData";
 import { IParser } from "./languages/ParserBase";
 import Javascript from "./languages/javascript/JavascriptParser";
 import Python from "./languages/python3/PythonParser";
@@ -62,10 +62,10 @@ export default class Parser {
      * @returns A tuple containing the list of filenames parsed, and a Map. The keys of this map are the file names, 
      * and the values are HashData objects containing data about the parsed functions.
      */
-    public static async ParseFiles({path, files}: {path?: string, files?: string[]}): Promise<{filenames: string[], result: Map<string, HashData[]>}> {
+    public static async ParseFiles({path, files}: {path?: string, files?: string[]}): Promise<{filenames: string[], result: HashData[]}> {
         files ??= getFiles(`${baseDir}/${path}`)
         const filenames: string[] = []
-        let result = new Map<string, HashData[]>()
+        let result: HashData[] = []
         files.forEach(file => {
             const { filename, lang } = getFileNameAndLanguage(file)
             if (!lang)
@@ -80,9 +80,9 @@ export default class Parser {
             parser.AddFile(content, filename)
         })
 
-        await Promise.all([...this.parsers.values()].map(async p => {
+        await Promise.all([...this.parsers.values()].map(async (p: IParser) => {
             const content = await p.Parse()
-            result = new Map([...result, ...content])
+            result.push(...content)
         }))
     
         return { filenames, result }
