@@ -1,6 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser';
-import { GithubInterface } from './src/GithubInterface';
+import { GithubInterface } from './src/spider/GithubInterface';
 import { TCPClient } from './src/databaseAPI/Client';
 import Parser from './src/parser/Parser';
 import { RequestType } from './src/databaseAPI/Request';
@@ -52,7 +52,7 @@ app.post('/fetch', async (req: any, res: any) => {
 
         await GithubInterface.ClearCache(dirName)
 
-        res.end(JSON.stringify(Object.fromEntries(result)))
+        res.end(JSON.stringify(result))
 
     }
     catch (e: any) {
@@ -69,8 +69,15 @@ app.post('/check', async (req, res) => {
     const { body: { hashes } } = validated.value
 
     const tcpClient = new TCPClient('dao', process.env.DB_PORT || 8003, process.env.DB_HOST || '127.0.0.1')
-    const response = await tcpClient.Fetch(RequestType.CHECK, hashes)
-    res.end(JSON.stringify(response))
+    const response = await tcpClient.Check(hashes)
+
+    const formatted = { 
+        methodData: response[0].response, 
+        authorData: response[1].response, 
+        projectData: response[2].response
+    }
+
+    res.end(JSON.stringify(formatted))
 })
 
 const server = app.listen({ port: process.env.PORT || 8080 })

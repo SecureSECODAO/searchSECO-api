@@ -1,4 +1,4 @@
-import HashData from "../../HashData";
+import HashData from "../../../utils/HashData";
 import { ParserBase } from "../ParserBase";
 import antlr4ts from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker'

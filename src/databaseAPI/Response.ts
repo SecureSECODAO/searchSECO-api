@@ -1,89 +1,85 @@
 import { RequestType } from './Request'
 
-export type ResponseData = {}
-export type CheckResponseData = ResponseData & {
-    method_hash?: string,
-    projectID?: string,
-    startVersion?: string,
-    startVersionHash?: string,
-    endVersion?: string,
-    endVersionHash?: string,
-    method_name?: string,
-    file?: string,
-    lineNumber?: string,
-    parserVersion?: string,
-    vulnCode?: string,
-    authorTotal?: string,
-    authorIds?: any
+export class ResponseData {}
+export class CheckResponseData extends ResponseData {
+    public method_hash: string = ''
+    public projectID: string = ''
+    public startVersion: string = ''
+    public startVersionHash: string = ''
+    public endVersion: string = ''
+    public endVersionHash: string = ''
+    public method_name: string = ''
+    public file: string = ''
+    public lineNumber: string = ''
+    public parserVersion: string = ''
+    public vulnCode: string = ''
+    public authorTotal: string = ''
+    public authorIds: string[] = []
+}
+export class AuthorResponseData extends ResponseData {
+    public username: string = ''
+    public email: string = ''
+    public uuid: string = ''
+}
+export class ProjectResponseData extends ResponseData {
+    public id: string = ''
+    public versionTime: string = ''
+    public versionHash: string = ''
+    public license: string = ''
+    public name: string = ''
+    public url: string = ''
+    public authorName: string = ''
+    public authorMail: string = ''
+    public defaultBranch: string = ''
 }
 
-export type TCPResponse = {
-    responseCode: number,
-    requestType: RequestType | undefined,
-    response: ResponseData[]
-} | undefined
-
-export interface IResponseDecoder {
-    Decode(raw: string[]): ResponseData[]
+export class TCPResponse {
+    public responseCode: number
+    public requestType: RequestType
+    public response: any[]
+    constructor(responseCode: number, requestType: RequestType, response: any[]) {
+        this.responseCode = responseCode
+        this.requestType = requestType
+        this.response = response
+    }
 }
 
-export class TCPCheckResponseDecoder implements IResponseDecoder {
+
+export class ResponseDecoder {
+    private _template: ResponseData
+    constructor(template: ResponseData) {
+        this._template = template
+    }
+    
+    public static GetResponseTemplate(type: RequestType): ResponseData {
+        switch (type) {
+            case RequestType.CHECK: return new CheckResponseData()
+            case RequestType.GET_AUTHOR: return new AuthorResponseData()
+            case RequestType.EXTRACT_PROJECTS: return new ProjectResponseData()
+            default: return new ResponseData()
+        }
+    }
+
     public Decode(raw: string[]): ResponseData[] {
-
         if (raw.includes('No results found.'))
             return []
 
         const decoded = [] as ResponseData[]
-
-        raw.forEach(method => {
-            const methodMetadata = this._makeResponseObject()
-            const rawMetadata = method.split('?')
-            Object.keys(methodMetadata).forEach((key, idx) => {
-                methodMetadata[key as keyof CheckResponseData] = rawMetadata[idx]
+        raw.forEach(line => {
+            const rawMetadata = line.split('?')
+            const decodedMetadata = JSON.parse(JSON.stringify(this._template)) as any
+            const keys = Object.keys(decodedMetadata)
+            keys.forEach((key, idx) => {
+                if (idx == keys.length - 1 && idx < rawMetadata.length - 1) {
+                    for (let i = idx; i < rawMetadata.length; i++)
+                        (decodedMetadata[key] as string[]).push(rawMetadata[i])
+                }
+                else if (typeof decodedMetadata[key] === 'object') decodedMetadata[key].push(rawMetadata[idx])
+                else decodedMetadata[key] = rawMetadata[idx]
             })
-            methodMetadata.authorIds = methodMetadata.authorIds.split(',')
-            decoded.push(methodMetadata)
+            // methodMetadata.authorIds = methodMetadata.authorIds.split(',')
+            decoded.push(decodedMetadata)
         })
         return decoded
      }
-
-     private _makeResponseObject(): CheckResponseData {
-        return {
-            method_hash: '',
-            projectID: '',
-            startVersion: '',
-            startVersionHash: '',
-            endVersion: '',
-            endVersionHash: '',
-            method_name: '',
-            file: '',
-            lineNumber: '',
-            parserVersion: '',
-            vulnCode: '',
-            authorTotal: '',
-            authorIds: [] as string[]
-        }
-     }
 }
-
-export class TCPUploadResponseDecoder  implements IResponseDecoder {
-    Decode(): ResponseData[] {
-        return [] as ResponseData[]
-    }
-}
-
- export class ResponseDecoderFactory {
-    private static _responseDecoders: { type: RequestType, decoder: IResponseDecoder }[] = []
-    public static GetDecoder(id: RequestType): IResponseDecoder {
-        const decoder: IResponseDecoder | undefined = this._responseDecoders.find(p => p.type == id)?.decoder
-        if (decoder)
-            return decoder
-        switch (id) {
-            case RequestType.CHECK: 
-                const newDecoder = new TCPCheckResponseDecoder()
-                this._responseDecoders.push({ type: id, decoder: newDecoder })
-                return newDecoder
-            default: throw new Error(`unknown request type: ${id}`)
-        }
-    }
- }

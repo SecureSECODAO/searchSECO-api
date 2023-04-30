@@ -1,4 +1,4 @@
-import HashData from "../HashData"
+import HashData from "../../utils/HashData"
 
 /**
  * The interface each language parser must implement
@@ -13,9 +13,9 @@ export interface IParser {
 
     /**
      * Parses the files stored in the buffer.
-     * @returns A promise which resolves to a Map containing the filenames and `HashData` objects
+     * @returns A promise which resolves to a HashData array
      */
-    Parse(): Promise<Map<string, HashData[]>>
+    Parse(): Promise<HashData[]>
 
     /**
      * Adds a file to the `files` member variable
@@ -44,13 +44,13 @@ export abstract class ParserBase implements IParser {
      */
     protected abstract parseSingle(data: string, filename: string): HashData[];
 
-    public async Parse(): Promise<Map<string, HashData[]>> {
-        const result = new Map<string, HashData[]>()
+    public async Parse(): Promise<HashData[]> {
+        const result: HashData[] = []
 
         return Promise.resolve().then(async () => {
             while (this.buffer.length > 0) {
                 const {filename, data} = this.buffer.pop() || { filename: "", data: "" }
-                result.set(filename, this.parseSingle(data, filename))
+                result.push(...this.parseSingle(data, filename))
             }
             // this.clear()
             return result
