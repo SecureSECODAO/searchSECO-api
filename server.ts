@@ -6,8 +6,13 @@ import Parser from './src/parser/Parser';
 import { RequestType } from './src/databaseAPI/Request';
 import logger from 'morgan'
 import j from 'joi';
-import { TCPResponse } from './src/databaseAPI/Response';
+import cors from 'cors'
 
+const app = express();
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(logger('dev'))
+app.use(cors())
 
 // Validate the request body for the Fetch request.
 // The body must contain a url, github token and a valid ETH wallet address. 
@@ -27,11 +32,6 @@ const checkSchema = j.object().keys({
         wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/)//.required()
     }).unknown().required()
 }).unknown()
-
-const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
-app.use(logger('dev'))
 
 app.post('/fetch', async (req: any, res: any) => {
     res.setHeader('Content-Type', 'application/json')
