@@ -1,3 +1,5 @@
+
+
 export enum RequestType {
     UPLOAD = 'upld',
     CHECK = 'chck',
@@ -16,32 +18,20 @@ export enum RequestType {
     UNDEFINED = 'undf'
 }
 
+
 export type TCPRequest = {
     type: RequestType,
     body: string[]
 }
 
-export interface IRequestGenerator {
-    Generate(type: RequestType, clientName: string, raw: string[]): TCPRequest
-}
-
-export class CheckRequestGenerator implements IRequestGenerator {
-    public Generate(type: RequestType, clientName: string, raw: string[]): TCPRequest {
+export class RequestGenerator {
+    public static Generate(type: RequestType, clientName: string, raw: string[]): TCPRequest {
         const dataLength = raw.reduce((prev, curr) => prev + `${curr}\n`.length, 0)
         const requests =
             [`${type}?${clientName}?${dataLength}\n`, raw.reduce((prev, curr) => prev + `${curr}\n`, "")]
         return {
             type,
             body: requests
-        }
-    }
-}
-
-export class RequestFactory {
-    static GetRequestGenerator(type: RequestType): IRequestGenerator {
-        switch (type) {
-            case RequestType.CHECK: return new CheckRequestGenerator()
-            default: throw new Error(`Request generator not implemted for id ${type}`)
         }
     }
 }
