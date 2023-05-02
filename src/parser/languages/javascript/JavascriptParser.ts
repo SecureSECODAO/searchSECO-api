@@ -1,6 +1,6 @@
 import HashData from "../../../utils/HashData";
 import { ParserBase } from "../ParserBase";
-import antlr4ts from 'antlr4ts';
+import { ANTLRInputStream, CommonTokenStream, TokenStreamRewriter } from 'antlr4ts';
 import { ParseTreeWalker } from 'antlr4ts/tree/ParseTreeWalker'
 import { JavaScriptLexer } from "./lib/JavaScriptLexer";
 import { JavaScriptParser } from "./lib/JavaScriptParser"
@@ -12,13 +12,13 @@ import JSListener from "./lib/JavaScriptParserListenerDerived";
  */
 export default class Javascript extends ParserBase {
     protected override parseSingle(data: string, filename: string): HashData[] {
-        const chars = new antlr4ts.ANTLRInputStream(data)
+        const chars = new ANTLRInputStream(data)
         const lexer = new JavaScriptLexer(chars)
-        const tokens = new antlr4ts.CommonTokenStream(lexer)
+        const tokens = new CommonTokenStream(lexer)
         tokens.fill()
 
         const parser = new JavaScriptParser(tokens)
-        const rewriter = new antlr4ts.TokenStreamRewriter(tokens)
+        const rewriter = new TokenStreamRewriter(tokens)
 
         parser.buildParseTree = true
 

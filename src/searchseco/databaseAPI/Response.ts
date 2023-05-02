@@ -46,12 +46,9 @@ export class TCPResponse {
 
 
 export class ResponseDecoder {
-    private _template: ResponseData
-    constructor(template: ResponseData) {
-        this._template = template
-    }
-    
-    public static GetResponseTemplate(type: RequestType): ResponseData {
+    private static readonly _instance = new ResponseDecoder()
+
+    private getResponseType(type: RequestType): ResponseData {
         switch (type) {
             case RequestType.CHECK: return new CheckResponseData()
             case RequestType.GET_AUTHOR: return new AuthorResponseData()
@@ -60,14 +57,16 @@ export class ResponseDecoder {
         }
     }
 
-    public Decode(raw: string[]): ResponseData[] {
+    public static Decode(request: RequestType, raw: string[]): ResponseData[] {
         if (raw.includes('No results found.'))
             return []
+
+        const response = ResponseDecoder._instance.getResponseType(request)
 
         const decoded = [] as ResponseData[]
         raw.forEach(line => {
             const rawMetadata = line.split('?')
-            const decodedMetadata = JSON.parse(JSON.stringify(this._template)) as any
+            const decodedMetadata = JSON.parse(JSON.stringify(response)) as any
             const keys = Object.keys(decodedMetadata)
             keys.forEach((key, idx) => {
                 if (idx == keys.length - 1 && idx < rawMetadata.length - 1) {

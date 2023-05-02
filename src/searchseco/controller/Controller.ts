@@ -1,4 +1,4 @@
-import HashData from "../utils/HashData";
+import HashData from "../../utils/HashData";
 import { Command } from "./Command";
 
 export type CommandOptions = {

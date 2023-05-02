@@ -1,11 +1,11 @@
-import Parser from './src/parser/Parser'
-import { GithubInterface } from './src/spider/GithubInterface';
+import Parser from '../parser/Parser'
+import { GithubInterface } from '../searchseco/spider/GithubInterface';
 import antlr4 from 'antlr4';
 import path from 'path';
 import fs from 'fs';
-import HashData from './src/utils/HashData';
-import { TCPClient } from './src/databaseAPI/Client';
-import { RequestType } from './src/databaseAPI/Request';
+import HashData from '../utils/HashData';
+import { TCPClient } from '../searchseco/databaseAPI/Client';
+import { RequestType } from '../searchseco/databaseAPI/Request';
 
 
 (async () => {

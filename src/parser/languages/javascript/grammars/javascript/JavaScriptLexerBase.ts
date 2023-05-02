@@ -1,14 +1,14 @@
-import antlr4ts from 'antlr4ts';
+import { Lexer, Token, CharStream } from 'antlr4ts';
 import { JavaScriptLexer } from '../../lib/JavaScriptLexer';
 
-export default abstract class JavaScriptLexerBase extends antlr4ts.Lexer {
+export default abstract class JavaScriptLexerBase extends Lexer {
     private scopeStrictModes = new Array();
-    private lastToken: antlr4ts.Token | null = null;
+    private lastToken: Token | null = null;
     private useStrictDefault = false;
     private useStrictCurrent = false;
     private templateDepth = 0;
 
-    constructor(input: antlr4ts.CharStream) {
+    constructor(input: CharStream) {
         super(input);
         // this.scopeStrictModes = new Array();
         // this.lastToken = null;
@@ -41,7 +41,7 @@ export default abstract class JavaScriptLexerBase extends antlr4ts.Lexer {
     nextToken() {
         var next = super.nextToken();
 
-        if (next.channel === antlr4ts.Token.DEFAULT_CHANNEL) {
+        if (next.channel === Token.DEFAULT_CHANNEL) {
             this.lastToken = next;
         }
         return next;

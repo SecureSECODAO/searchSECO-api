@@ -1,9 +1,9 @@
-import antlr4ts from 'antlr4ts';
+import { Parser, Lexer, TokenStream } from 'antlr4ts';
 import { JavaScriptParser } from '../../lib/JavaScriptParser';
 
-export default abstract class JavaScriptParserBase extends antlr4ts.Parser {
+export default abstract class JavaScriptParserBase extends Parser {
 
-    constructor(input: antlr4ts.TokenStream) {
+    constructor(input: TokenStream) {
         super(input);
     }
 
@@ -46,13 +46,13 @@ export default abstract class JavaScriptParserBase extends antlr4ts.Parser {
     here(type: any) {
         const possibleIndexEosToken = this.currentToken.tokenIndex - 1;
         const ahead = this._input.get(possibleIndexEosToken);
-        return ahead.channel === antlr4ts.Lexer.HIDDEN && ahead.type === type;
+        return ahead.channel === Lexer.HIDDEN && ahead.type === type;
     }
 
     lineTerminatorAhead() {
         let possibleIndexEosToken = this.currentToken.tokenIndex - 1;
         let ahead = this._input.get(possibleIndexEosToken);
-        if (ahead.channel !== antlr4ts.Lexer.HIDDEN) {
+        if (ahead.channel !== Lexer.HIDDEN) {
             return false;
         }
         if (ahead.type === JavaScriptParser.LineTerminator) {

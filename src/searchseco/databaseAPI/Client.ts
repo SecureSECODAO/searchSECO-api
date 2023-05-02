@@ -34,10 +34,6 @@ export class TCPClient implements ITCPClient {
         this._host = host
 
         this._client = new Socket()
-
-        this._client.on('connect', () => {
-            console.log(`Connected to ${this._host}:${this._port}`)
-        })
         this._client.on('error', (err: any) => {
             this._error = err
         })
@@ -48,18 +44,13 @@ export class TCPClient implements ITCPClient {
             this._requestProcessed = true
             this._busy = false
 
-            const decoder = new ResponseDecoder(ResponseDecoder.GetResponseTemplate(type))
-
             this._response = new TCPResponse(
                 parseInt(code),
                 type,
-                decoder.Decode(rawResponse.filter((r: string) => r !== ''))
+                ResponseDecoder.Decode(type, rawResponse.filter((r: string) => r !== ''))
             )
             console.log("Done!")
             this._client.destroy()
-        })
-        this._client.on('close', () => {
-            console.log('Connection closed')
         })
     }
 
