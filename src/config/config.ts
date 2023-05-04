@@ -1,5 +1,5 @@
 import path from "path";
-import dotenv from 'dotenv'
+import dotenv from "dotenv";
 
 dotenv.config({ path: path.join(__dirname, "../config/.env") });
 
@@ -8,6 +8,7 @@ interface ENV {
     DB_HOST: string | undefined;
     PORT: string | number | undefined;
     HOST: string | undefined;
+    DAO_CONTRACT_ADDRESS: `0x${string}` | undefined;
 }
 
 interface Config {
@@ -15,6 +16,7 @@ interface Config {
     DB_HOST: string | undefined;
     PORT: string | number | undefined;
     HOST: string | undefined;
+    DAO_CONTRACT_ADDRESS: `0x${string}` | undefined;
 }
 
 function getConfig(): ENV {
@@ -22,19 +24,19 @@ function getConfig(): ENV {
         DB_PORT: process.env.DB_PORT,
         DB_HOST: process.env.DB_HOST,
         PORT: process.env.PORT,
-        HOST: process.env.HOST
-    }
+        HOST: process.env.HOST,
+        DAO_CONTRACT_ADDRESS: process.env.DAO_CONTRACT_ADDRESS as `0x${string}`,
+    };
 }
 
 function getSanitizedConfig(config: ENV): Config {
     for (const [key, value] of Object.entries(config)) {
-        if (value === undefined)
-            throw new Error(`Missing key ${key} in .env`)
+        if (value === undefined) throw new Error(`Missing key ${key} in .env`);
     }
-    return config as Config
+    return config as Config;
 }
 
-const config = getConfig()
-const sanitizedConfig = getSanitizedConfig(config)
+const config = getConfig();
+const sanitizedConfig = getSanitizedConfig(config);
 
-export default sanitizedConfig
+export default sanitizedConfig;
