@@ -3,7 +3,7 @@ import { Router, Request, Response } from "express";
 import * as controller from "../controllers/monetization";
 import { v4 as uuidv4 } from "uuid";
 import { createPublicClient, http } from "viem";
-import { mainnet, goerli, polygonMumbai } from "viem/chains";
+import { mainnet, goerli, polygonMumbai, polygon } from "viem/chains";
 import { CronJob } from "cron";
 import AsyncLock from "async-lock";
 import config from "../config/config";
@@ -19,8 +19,8 @@ const lock = new AsyncLock();
 /**
  * Create a client so we can listen to events from the contract
  */
-const client = createPublicClient({
-    chain: polygonMumbai,
+export const client = createPublicClient({
+    chain: config.NODE_ENV === "production" ? polygon : polygonMumbai,
     transport: http(),
 });
 
@@ -78,9 +78,6 @@ export const cost = async (req: Request, res: Response): Promise<void> => {
 /**
  * POST /startSession
  * Starts a new session, which later will store the data for the given hashes.
- * Body: {
- *  hashes: string[] // List of hashes to retrieve data for
- * }
  */
 export const startSession = async (
     req: Request,
@@ -170,22 +167,19 @@ export const getData = async (req: Request, res: Response): Promise<void> => {
     const sessId = req.query.sessId as string;
     const secret = req.query.secret as string;
 
-    await lock.acquire(`session_${sessId}`, () => {
-        const session = sessions.get(sessId);
-
-        if (session && session.secret === secret) {
-            res.json({
-                status: "ok",
-                data: session.data,
-                fetch_status: session.fetch_status,
-            });
-        } else {
-            res.json({
-                status: "error",
-                error: "Session not found",
-            });
-        }
-    });
+    const session = sessions.get(sessId);
+    if (session && session.secret === secret) {
+        res.json({
+            status: "ok",
+            data: session.data,
+            fetch_status: session.fetch_status,
+        });
+    } else {
+        res.json({
+            status: "error",
+            error: "Session not found",
+        });
+    }
 };
 
 // Clean sessions up

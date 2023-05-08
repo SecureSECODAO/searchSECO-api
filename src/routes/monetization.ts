@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as controller from "../../controllers/monetization";
+import * as controller from "../controllers/monetization";
 import { celebrate, Joi } from "celebrate";
 
 export const api = Router();
