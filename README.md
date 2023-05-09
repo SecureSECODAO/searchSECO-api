@@ -153,7 +153,7 @@ This feature is gonna allow users to get paid in reputation and/or monetary toke
 
 #### POST `/reward`
 
-...
+This endpoint allows users to claim their reward for submitting hashes.
 
 ##### Request body
 
