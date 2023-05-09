@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { GithubInterface } from '../searchseco/spider/GithubInterface'
-import Parser from '../parser/Parser'
+import Parser from '../searchseco/parser/Parser'
 import { TCPClient } from '../searchseco/databaseAPI/Client'
 import config from '../config/config'
 
