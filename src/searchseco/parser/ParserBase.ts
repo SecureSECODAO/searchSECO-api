@@ -54,7 +54,8 @@ export abstract class ParserBase implements IParser {
         return Promise.resolve().then(async () => {
             await Promise.all(this.buffer.map(async ({ filename, filepath, data }) => {
                 const singleResult = await this.parseSingle(data, this._usePath ? filepath : filename)
-                result.push(...singleResult)
+                if (singleResult)
+                    result.push(...singleResult)
             }))
             this.clear()
             return result

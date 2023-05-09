@@ -52,7 +52,6 @@ export default class XMLParser extends ParserBase {
         const prev = this._current.GetPrevious()
         if (this._current.GetTag() === "function" && this._parseFurther) {
             const ab = GetHashable(this._current)
-            console.log(ab.GetString(), this._minFunctionChars, this._lineNumber - this._startLastFunction, this._minFunctionLines)
             if (ab.GetString().length > this._minFunctionChars  && this._lineNumber - this._startLastFunction > this._minFunctionLines) { 
                 this._hashes.push(new HashData(
                     md5(ab.GetString()), 
@@ -136,6 +135,7 @@ export default class XMLParser extends ParserBase {
         }
         catch (err) {
             console.log(err.toString())
+            return ''
         }
     }
 
