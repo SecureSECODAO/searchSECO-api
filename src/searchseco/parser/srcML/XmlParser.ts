@@ -10,13 +10,11 @@ import StringStream from "./StringStream";
 
 export default class XMLParser extends ParserBase {
     private readonly _language: Language
-    private readonly _buffer: HashData[]
     private inFunction: boolean = false
     private _parseFurther: boolean = true
     private _current: Node
     private _tree: Node
 
-    private static readonly internalParser = new Parser()
     constructor(lang: Language) {
         super(true)
         this._language = lang
@@ -54,14 +52,18 @@ export default class XMLParser extends ParserBase {
         }
     }
 
-    private parseToTree(input: string): Node {
+    private ParseXMLStream(input: string): HashData[] {
 		const stream = new StringStream(input)
+        const hashes: HashData[] = []
+
         this._tree = new Node("unknown")
         const firstTag = this.getNextTag(stream)
         if (stream.Empty() && firstTag.tag === "")
             return
-		if (firstTag.tag !== "?xml")
-			return
+		if (firstTag.tag !== "?xml") {
+            this._tree = undefined
+			return []
+        }
 
 		let inFunction = false
 		this._current = this._tree
@@ -82,19 +84,15 @@ export default class XMLParser extends ParserBase {
 		}
     }
 
-    private async parseToXML(path: string): Promise<Node> {
+    private async parseToXML(path: string): Promise<string> {
         const cmd = `srcml ${path} -l ${this._language}`
         try {
             const stdout = execSync(cmd)
-            return Node.ParseToTree(stdout.toString())
+            return stdout.toString()
         }
         catch (err) {
             console.log(err.toString())
         }
-    }
-
-    private collapse(parent: any, parentTag: string = ''): void {
-       
     }
 
     protected async parseSingle(data: string, filename: string): Promise<HashData[]> {
