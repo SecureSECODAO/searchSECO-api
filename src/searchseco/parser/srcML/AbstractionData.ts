@@ -24,6 +24,7 @@ function nodeToString(node: Node, abstraction: AbstractionData, inFunction: bool
             if (parent) {
                 while (parent.GetTag() === "name") 
                     parent = parent.GetPrevious()
+
                 if (parent.GetTag() === "type") {
                     if (inFunction) 
                         abstraction.AddString(content)
@@ -61,6 +62,8 @@ export function GetHashable(node: Node): AbstractionData {
                     collapseNodes(grandChild, abstraction, true)
                 }
             })
+        } else {
+            collapseNodes(child, abstraction, false)
         }
     })
     return abstraction
@@ -75,8 +78,16 @@ export class AbstractionData {
         this._funcName = funcName
     }
 
+    public GetString() {
+        return this._data
+    }
+
+    public GetFunctionName() {
+        return this._funcName
+    }
+
     public AddString(str: string) {
-        this._data.concat(str)
+        this._data = this._data.concat(str)
     }
 
     public SetFunctionName(name: string) {

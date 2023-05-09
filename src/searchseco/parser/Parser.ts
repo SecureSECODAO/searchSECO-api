@@ -66,7 +66,7 @@ export default class Parser {
     static parsers: Map<Language, IParser> = new Map<Language, IParser>([
         [Language.JS, new Javascript()],
         [Language.PYTHON, new Python()],
-        [Language.CPP, new CPP()],
+        [Language.CPP, new XMLParser(Language.CPP)],
         [Language.CSHARP, new XMLParser(Language.CSHARP)],
         [Language.JAVA, new XMLParser(Language.JAVA)]
     ]);

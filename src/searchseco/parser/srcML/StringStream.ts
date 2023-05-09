@@ -23,10 +23,13 @@ export default class StringStream {
         return this._readHead >= this._buffer.length - 1
     }
 
+    public GetLastLineNumber(): number {
+        return this._lineNumber
+    }
+
     public GetDataUntil(breakOn: string[], removeWhiteSpace: boolean) : {
         output: string,
-        brokeOn: string,
-        lineNumber: number
+        brokeOn: string
     } {
         let output = ''
         while (this._readHead < this._buffer.length) {
@@ -35,8 +38,7 @@ export default class StringStream {
                 if (breakOn[i] === next) {
                     return {
                         output, 
-                        brokeOn: next, 
-                        lineNumber: this._lineNumber
+                        brokeOn: next
                     }
                 }
             if (next === "\n") {
@@ -49,8 +51,7 @@ export default class StringStream {
         }
         return {
             output,
-            brokeOn: '',
-            lineNumber: this._lineNumber
+            brokeOn: ''
         }
     }
 }
