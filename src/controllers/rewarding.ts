@@ -81,7 +81,7 @@ const generateProof = async (
 export const reward = async (req: Request, res: Response): Promise<void> => {
     const { hashes, address } = req.body;
 
-    // TODO: Somehow check the amount of new hashes
+    // Somehow check the amount of new hashes
     // hashes = ... ???
 
     // Retrieve the user's current hash count, use this as the nonce
