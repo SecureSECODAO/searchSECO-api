@@ -97,7 +97,7 @@ export class TCPClient implements ITCPClient {
         
         this._request = RequestGenerator.Generate(type, this._clientName, data)
 
-        this._request.body.forEach(request => this._sendData(request))
+        this._request.body.forEach(r => this._sendData(r))
 
         while (!this._requestProcessed) {
             await new Promise(resolve => setTimeout(resolve, 500))
