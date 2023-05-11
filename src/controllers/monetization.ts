@@ -173,6 +173,7 @@ export const getData = async (req: Request, res: Response): Promise<void> => {
             status: "ok",
             data: session.data,
             fetch_status: session.fetch_status,
+            timestamp: session.timestamp,
         });
     } else {
         res.json({
