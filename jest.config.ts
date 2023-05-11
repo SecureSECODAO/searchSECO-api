@@ -4,7 +4,10 @@ const Config: Config.InitialOptions = {
     verbose: true,
     transform: {
         '^.+\\.tsx?$': 'ts-jest'
-    }
+    },
+    modulePathIgnorePatterns: ["<rootDir>/dist/"],
+
+    setupFiles: ["<rootDir>/src/test/setup.ts"],
 }
 
 export default Config

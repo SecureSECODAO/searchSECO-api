@@ -41,7 +41,7 @@ type SessionData = {
 const sessions = new Map<string, SessionData>();
 
 /**
- * GET /cost?url=...
+ * POST /cost
  * Retrieves amount of hashes contained with the given GitHub repository.
  */
 export const cost = async (req: Request, res: Response): Promise<void> => {
