@@ -44,7 +44,7 @@ export default class Spider {
             await this.git.checkout(branch);
         }
         catch (error){
-            console.error('Failed to download ${url} to ${filePath}: ${error}');
+            console.error(`Failed to download ${url} to ${filePath}: ${error}`);
             throw error;
         }
     }
@@ -86,7 +86,7 @@ export default class Spider {
             await git.checkout(tag);
         }
         catch (error){
-            console.error('Failed to switch to version ${tag} at ${filePath}: ${error}');
+            console.error(`Failed to switch to version ${tag} at ${filePath}: ${error}`);
             throw error;
         }
     }
