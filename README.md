@@ -146,3 +146,29 @@ Why is a secret required? The session ids are emitted in an event on the blockch
   "fetch_status": <fetch_status>,
 }
 ```
+
+## Rewarding (getting paid for hash data)
+
+This feature is gonna allow users to get paid in reputation and/or monetary tokens in exchange for SearchSECO queries.
+
+#### POST `/reward`
+
+This endpoint allows users to claim their reward for submitting hashes.
+
+##### Request body
+
+```
+{
+  "hashes": <list of hashes the user wants to submit>,
+  "address": <what address to reward>
+}
+```
+
+##### Response body
+
+```
+{
+  "status": <status>,
+  "proof": <proof that can be used with smart contract>
+}
+```
