@@ -1,9 +1,3 @@
-type IOType = {
-    internalType: string;
-    name: string;
-    type: string;
-}[];
-
 export const abi = [
     {
         anonymous: false,
@@ -31,7 +25,7 @@ export const abi = [
         type: "event",
     },
     {
-        inputs: [] as IOType,
+        inputs: [],
         name: "UPDATE_HASH_COST_MAPPING_PERMISSION_ID",
         outputs: [
             {
@@ -90,7 +84,7 @@ export const abi = [
             },
         ],
         name: "updateHashCost",
-        outputs: [] as IOType,
+        outputs: [],
         stateMutability: "nonpayable",
         type: "function",
     },
