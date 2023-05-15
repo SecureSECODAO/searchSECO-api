@@ -2,6 +2,9 @@ import request from "supertest";
 import { app } from "../app";
 
 const githubToken = process.env.GITHUB_TOKEN;
+if (!githubToken) {
+    throw new Error("GITHUB_TOKEN not set in .env.test.local");
+}
 
 describe("POST /monetization/cost", () => {
     it("should be able to retrieve the cost of a repository", (done) => {

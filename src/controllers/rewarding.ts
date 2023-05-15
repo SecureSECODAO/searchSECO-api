@@ -81,24 +81,39 @@ const generateProof = async (
 export const reward = async (req: Request, res: Response): Promise<void> => {
     const { hashes, address } = req.body;
 
-    // Somehow check the amount of new hashes
-    // hashes = ... ???
+    try {
+        // Somehow check the amount of new hashes
+        // hashes = ... ???
 
-    // Retrieve the user's current hash count, use this as the nonce
-    const data = await client.readContract({
-        address: config.DAO_CONTRACT_ADDRESS,
-        abi,
-        functionName: "getHashCount",
-        args: [address],
-    });
+        console.log(config.NODE_ENV);
 
-    const nonce = data as number;
+        let data;
+        // Retrieve the user's current hash count, use this as the nonce
+        if (config.NODE_ENV !== "test") {
+            data = await client.readContract({
+                address: config.DAO_CONTRACT_ADDRESS,
+                abi,
+                functionName: "getHashCount",
+                args: [address],
+            });
+        } else {
+            data = 1;
+        }
 
-    // Generate proof
-    const proof = await generateProof(address, hashes.length, nonce);
+        const nonce = data as number;
 
-    res.json({
-        status: "ok",
-        proof,
-    });
+        // Generate proof
+        const proof = await generateProof(address, hashes.length, nonce);
+
+        res.json({
+            status: "ok",
+            proof,
+        });
+    } catch (error: any) {
+        console.error(error);
+        res.json({
+            status: "error",
+            error: error.message,
+        });
+    }
 };

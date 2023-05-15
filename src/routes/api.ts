@@ -1,6 +1,7 @@
 import { celebrate, Joi } from "celebrate";
 import { Router } from "express";
 import { api as monetizationApi } from "./monetization";
+import { api as rewardingApi } from "./rewarding";
 import * as controller from "../controllers/api";
 
 export const api = Router();
@@ -37,3 +38,4 @@ api.post(
 );
 
 api.use("/monetization", monetizationApi);
+api.use("/rewarding", rewardingApi);
