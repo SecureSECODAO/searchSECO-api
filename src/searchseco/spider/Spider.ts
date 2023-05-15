@@ -1,34 +1,9 @@
-import simpleGit, { SimpleGit } from 'simple-git';
+import * as nodegit from 'nodegit';
 import * as fs from 'fs';
 import * as path from 'path';
 
-interface CommitData {
-    author: string;
-    authorMail: string;
-    authorTime: string;
-    authorTz: string;
-    committer: string;
-    committerMail: string;
-    committerTime: string;
-    committerTz: string;
-    summary: string;
-    previousHash: string;
-    fileName: string;
-}
-
-interface CodeBlock {
-    line: number;
-    numLines: number;
-    commit: CommitData;
-}
-
 export default class Spider {
-    private git: SimpleGit;
-
-    constructor() {
-        this.git = simpleGit();
-    }
-
+    private repo: nodegit.Repository | null = null;
     /**
      * Downloads a repository from a given source and stores it
      * locally at the location defined by filePath.
@@ -39,9 +14,9 @@ export default class Spider {
      */
     async downloadRepo(url: string, filePath: string, branch: string): Promise<void> {
         try {
-            await this.git.clone(url, filePath);
-            this.git.cwd(filePath);
-            await this.git.checkout(branch);
+            await nodegit.Clone.clone(url, filePath, {});
+            this.repo = await nodegit.Repository.open(filePath);
+            await this.checkoutBranch(branch);
         }
         catch (error){
             console.error(`Failed to download ${url} to ${filePath}: ${error}`);
@@ -59,19 +34,7 @@ export default class Spider {
      * @returns Unchanged files between versions.
      */
     async updateRepo(filePath: string, prevTag: string, newTag: string, prevUnchanged: string[]): Promise<string[]> {
-        const git = simpleGit(filePath);
-        let unchanged: string[] = [];
-
-        try{
-            await git.fetch();
-            await git.checkout(newTag);
-
-            const diffSummary = await git.diffSummary([prevTag, newTag]);
-            // Delete unchanged
-
-            return unchanged;
-        }
-        catch{}
+        undefined;
     }
 
     /**
@@ -79,49 +42,24 @@ export default class Spider {
      *
      * @param tag Name of the version to update to.
      * @param filePath Local path where project is stored.
-     */
-    async switchVersion(tag: string, filePath: string): Promise<void> {
+    */
+    async switchVersion(tag: string): Promise<void> {
         try {
-            const git = simpleGit(filePath);
-            await git.checkout(tag);
-        }
-        catch (error){
-            console.error(`Failed to switch to version ${tag} at ${filePath}: ${error}`);
+            if (!this.repo) {
+                throw new Error('Repository not initialized.');
+            }
+            await this.checkoutBranch(tag);
+        } catch (error) {
+            console.error(`Failed to switch to version ${tag}: ${error}`);
             throw error;
         }
     }
 
-    /**
-     * Extracts author data from locally stored project.
-     *
-     * @param filePath Local path where project is stored.
-     * @returns AuthorData object containing extracted author data.
-     */
-    async getAuthors(filePath: string): Promise<Map<string, string[]>> {
-        try {
-            const git = simpleGit(filePath);
-            const files = fs.readdirSync(filePath);
-            const authorData = new Map<string, string[]>();
-
-            for (const file of files) {
-                if (fs.lstatSync(path.join(filePath, file)).isDirectory()) {
-                    continue;
-                }
-
-                const blameRaw: string = await git.raw(['blame', file]);
-                const blameLines = blameRaw.split('\n');
-                const authors = blameLines.map(line => {
-                    const match = line.match(/\((.*?)\s*\d{4}/);
-                    return match ? match[1].trim() : 'Unknown';
-                });
-
-                authorData.set(file, authors);
-            }
-
-            return authorData;
-        } catch (error) {
-            console.error(`Failed to get authors from ${filePath}: ${error}`);
-            throw error;
+    private async checkoutBranch(branchName: string): Promise<void> {
+        if (!this.repo) {
+            throw new Error('Repository not initialized.');
         }
+        const commit = await this.repo.getBranchCommit(branchName);
+        await this.repo.checkoutBranch(commit, {});
     }
 }
