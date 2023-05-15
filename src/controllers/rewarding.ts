@@ -85,8 +85,6 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
         // Somehow check the amount of new hashes
         // hashes = ... ???
 
-        console.log(config.NODE_ENV);
-
         let data;
         // Retrieve the user's current hash count, use this as the nonce
         if (config.NODE_ENV !== "test") {
@@ -98,6 +96,7 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
             });
         } else {
             data = 1;
+            console.log("Using test data");
         }
 
         const nonce = data as number;
