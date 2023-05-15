@@ -2,13 +2,15 @@ import { celebrate, Joi } from "celebrate";
 import { Router, Request, Response } from "express";
 import * as controller from "../controllers/monetization";
 import { v4 as uuidv4 } from "uuid";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, encodeEventTopics, http } from "viem";
 import { mainnet, goerli, polygonMumbai, polygon } from "viem/chains";
 import { CronJob } from "cron";
 import AsyncLock from "async-lock";
 import config from "../config/config";
 import { abi } from "../abi/monetization_abi";
 import { check, checkHashes, fetchHashes } from "./api";
+import { decodeEventLog } from "viem";
+
 export const monetization = Router();
 
 /**
@@ -115,9 +117,12 @@ const unwatch = client.watchContractEvent({
     abi,
     eventName: "PaymentProcessed",
     onLogs: (logs) => {
-        console.log(logs);
         for (const log of logs) {
-            const sessId = (log.args as any).uniqueId;
+            console.log(
+                `PaymentProcessed(sender: ${log.args.sender}, amount: ${log.args.amount}, uniqueId: ${log.args.uniqueId})`
+            );
+
+            const sessId = log.args.uniqueId;
             handlePaidSession(sessId);
         }
     },
