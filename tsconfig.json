@@ -18,5 +18,5 @@
   "include": [
       "src/**/*",
       "src/config/.env"
-  ]
+, "tests/monetization/monetization.test.ts", "tests/rewarding/rewarding.test.ts"  ]
 }
