@@ -2,20 +2,19 @@ import HashData from "../../utils/HashData";
 import { IParser } from "./ParserBase";
 import Javascript from "./languages/javascript/JavascriptParser";
 import Python from "./languages/python3/PythonParser";
-import CPP from './languages/cpp/CPPParser'
 import * as fs from 'fs'
 import path from 'path'
 import XMLParser from "./srcML/XmlParser";
 
 const storageDir = '.tmp'
 
-export enum XMLSupportedLanguage {
+enum XMLSupportedLanguage {
     CPP = "C++",
     CSHARP = "C#",
     JAVA = "Java"
 }
 
-export enum ANTLRSupportedLanguage {
+enum ANTLRSupportedLanguage {
     PYTHON = "Python",
     JS = "Javascript",
 }
@@ -52,7 +51,7 @@ function getFileNameAndLanguage(filepath: string): {filename: string, lang: Lang
         case "py": return { filename, lang: Language.PYTHON } 
         case "js": return { filename, lang: Language.JS }
         case "cpp": return { filename, lang: Language.CPP }
-        case "csharp": return { filename, lang: Language.CSHARP }
+        case "cs": return { filename, lang: Language.CSHARP }
         case "java": return { filename, lang: Language.JAVA }
         default: return {filename: filename || '', lang: undefined}
     }

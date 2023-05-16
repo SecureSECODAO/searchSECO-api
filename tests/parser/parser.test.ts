@@ -7,26 +7,30 @@ describe('The parser', () => {
     const results = {
         "js": <HashData[]>[],
         "python": <HashData[]>[],
-        "cpp": <HashData[]>[]
+        "cpp": <HashData[]>[],
+        "cs": <HashData[]>[],
+        "java": <HashData[]>[]
     }
 
     beforeAll(async () => {
         results["js"] = (await Parser.ParseFiles({ files: [ 'tests/parser/to_parse/a.js' ] })).result
         results["python"] = (await Parser.ParseFiles({ files: [ 'tests/parser/to_parse/a.py' ] })).result
         results["cpp"] = (await Parser.ParseFiles({ files: [ 'tests/parser/to_parse/a.cpp' ] })).result
+        results["cs"] = (await Parser.ParseFiles({ files: [ 'tests/parser/to_parse/a.cs' ] })).result
+        results["java"] = (await Parser.ParseFiles({ files: [ 'tests/parser/to_parse/a.java' ] })).result
     })
 
     describe("extracts correct function hashes from", () => {
         test('a javascript file', async () => {
             const resultMap = {
+                "main": {
+                    Hash: "4e9ae211289aa2952bc0095b809e5811"
+                },
                 "test": {
-                    Hash: "cae02f5f0917dbd5f5c1a1434bb78b11"
+                    Hash: "87c0b95dd6809eb25d88182619a67cc3" 
                 },
-                "mult": {
-                    Hash: "b4e156d5abd7783bc3f69d868d49498f" 
-                },
-                "<anonymous>": { 
-                    Hash: "e2c1d84261aa52d495ac31b5b07e9ce7"
+                "multiply": { 
+                    Hash: "74575f74059e69eda6903e280881dd0e"
                 }
             }
     
@@ -37,12 +41,15 @@ describe('The parser', () => {
 
         test('a python file', () => {
             const resultMap = {
-                "test": { 
-                    Hash: "0e5c70fbbd0fad6e518eb6e715c95043" 
+                "main": {
+                    Hash: "e98a29cebb7e0c784e380e773420d3e5"
                 },
-                "mult": { 
+                "test": {
+                    Hash: "2265ae19af53210fff624a55552e2754" 
+                },
+                "multiply": { 
                     Hash: "b530d6067cdedb1a971647bccefb68df"
-                },
+                }
             }
             results["python"].forEach((r: HashData) => {
                 expect(r.Hash).toBe(resultMap[r.FunctionName as keyof typeof resultMap].Hash)
@@ -66,17 +73,40 @@ describe('The parser', () => {
             })
         })
 
-        // test('a csharp file', () => {
+        test('a csharp file', () => {
+            const resultMap = {
+                "Main": {
+                    Hash: "86d6e84b3e87436fc7a1543885553871"
+                },
+                "Test": {
+                    Hash: "e97f3a052bc552c84481ca54a44c8aa3" 
+                },
+                "Multiply": { 
+                    Hash: "74575f74059e69eda6903e280881dd0e"
+                }
+            }
+            results["cs"].forEach((r: HashData) => {
+                expect(r.Hash).toBe(resultMap[r.FunctionName as keyof typeof resultMap].Hash)
+            })
+        })
 
-        // })
-
-        // test('a java file', () => {
-            
-        // })
+        test('a java file', () => {
+            const resultMap = {
+                "Main": {
+                    Hash: "ba6ede36f60c0dbeda878c7e859fa0b2"
+                },
+                "Test": {
+                    Hash: "45495c06036f13bd1bf7ce95a5fff54e" 
+                },
+                "Multiply": { 
+                    Hash: "74575f74059e69eda6903e280881dd0e"
+                }
+            }
+            results["java"].forEach((r: HashData) => {
+                expect(r.Hash).toBe(resultMap[r.FunctionName as keyof typeof resultMap].Hash)
+            })
+        })
     })
-
-
-
 })
 
 

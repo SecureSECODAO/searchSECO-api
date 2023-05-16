@@ -5,7 +5,7 @@ import HashData from "../../../../../utils/HashData";
 import md5 from "md5";
 import { TerminalNode } from "antlr4ts/tree/TerminalNode";
 
-export default class P3Listener implements Python3Listener {
+export default class CustomPython3Listener implements Python3Listener {
     protected minMethodSize: number
     protected minFunctionChars: number
     protected readonly baseTSR: TokenStreamRewriter
