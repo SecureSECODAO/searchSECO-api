@@ -172,3 +172,15 @@ This endpoint allows users to claim their reward for submitting hashes.
   "proof": <proof that can be used with smart contract>
 }
 ```
+
+# Testing
+
+We use (Jest)[https://jestjs.io/] for testing. The tests for the API endpoints are located in the `src/test` folder, and the tests for the parser are located in the `tests/parser` folder.
+
+## Env file
+
+At the root level, create a file called .env.test.local. See .env.test.local.example to see what should be in it.
+
+## Running the tests
+
+To run the tests, run `npm run test`. Note that this runs the tests in silent mode, so you won't see any output. To see the output, run `npm run test-verbose`.

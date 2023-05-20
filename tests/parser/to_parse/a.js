@@ -1,14 +1,19 @@
 
+class Test {
+    test() {
+        const i = 3
+        const j = 5
+        console.log(i * j)
+    }
 
-function test(t) {
-    console.log(t)
+    multiply(a,b) {
+        return a * b
+    }
 }
 
-function mult(x, y) {
-    return x * y
-}
- 
-const a = function (res, req) {
-    const a = (() => 4)()
-    console.log(a)
+function main() {
+    const p = new Test()
+    const a = p.multiply(3,4)
+    p.test()
+    console.log("Hello World")
 }

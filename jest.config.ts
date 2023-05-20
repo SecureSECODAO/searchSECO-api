@@ -3,8 +3,11 @@ import type { Config } from "@jest/types";
 const Config: Config.InitialOptions = {
     verbose: true,
     transform: {
-        '^.+\\.tsx?$': 'ts-jest'
-    }
-}
+        "^.+\\.tsx?$": "ts-jest",
+    },
+    modulePathIgnorePatterns: ["<rootDir>/dist/"],
 
-export default Config
+    setupFiles: ["<rootDir>/tests/setup/setup.ts"],
+};
+
+export default Config;

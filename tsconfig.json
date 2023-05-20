@@ -19,5 +19,5 @@
       "src/**/*",
       "src/config/.env",
       "src/types/*"
-  ]
+, "tests/monetization/monetization.test.ts", "tests/rewarding/rewarding.test.ts"  ]
 }
