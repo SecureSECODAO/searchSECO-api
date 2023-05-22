@@ -1,5 +1,5 @@
-import Parser from '../../src/searchseco/parser/Parser'
-import HashData from '../../src/utils/HashData'
+import Parser from '../../searchseco/searchSECO-parser/Parser'
+import HashData from '../../searchseco/searchSECO-parser/HashData'
 
 
 describe('The parser', () => {

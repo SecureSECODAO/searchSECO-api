@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { GithubInterface } from "../searchseco/spider/GithubInterface";
-import Parser from "../searchseco/parser/Parser";
-import { TCPClient } from "../searchseco/databaseAPI/Client";
+import Parser from "../searchseco/searchSECO-parser/Parser";
+import { TCPClient } from "../searchseco/searchSECO-databaseAPI/Client";
 import config from "../config/config";
 
 export async function fetch(req: Request, res: Response): Promise<void> {
