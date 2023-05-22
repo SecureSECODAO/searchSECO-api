@@ -1,5 +1,15 @@
 import { Octokit } from 'octokit';
 
+interface ProjectMetadata {
+    version: string;
+    license: string;
+    name: string;
+    url: string;
+    authorName: string;
+    authorMail: string;
+    defaultBranch: string;
+}
+
 interface CrawlData {
     URLImportanceList: Array<{ url: string, importance: number, finalProjectId: number }>;
     languages: LanguageCount;
