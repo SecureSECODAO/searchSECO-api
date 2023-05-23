@@ -35,7 +35,7 @@ export class Crawler {
      * Return repos based on the query.
      * @param page Page number to get repos from
      */
-    private async getRepos(page: number): Promise<any> {
+    public async getRepos(page: number): Promise<any> {
         return await this.octo.request('GET /search/repositories', {
             q: 'fork: false',   // Replace with an actual query? Maybe date?
             sort: 'stars',
@@ -67,7 +67,7 @@ export class Crawler {
         while (totalProcessedRepos < this.maxRepos) {
             try {
                 const repos = await this.getRepos(page);
-                console.log(repos.data.items);
+                //console.log(repos.data.items);
                 if (repos.data.items.length === 0)
                     break;
                 totalProcessedRepos += repos.data.items.length;
@@ -95,6 +95,25 @@ export class Crawler {
         }
 
         return { URLImportanceList, languages, finalProjectId };
+    }
+
+    public async getProjectMetadata(repo: any): Promise<ProjectMetadata> {
+        const { data } = await this.octo.rest.repos.get({
+            owner: repo.owner.login,
+            repo: repo.name
+        });
+    
+        const metadata: ProjectMetadata = {
+            version: data.pushed_at,
+            license: data.license ? data.license.name : "",
+            name: data.name,
+            url: data.html_url,
+            authorName: data.owner.login,
+            authorMail: "",
+            defaultBranch: data.default_branch,
+        };
+    
+        return metadata;
     }
 }
 
