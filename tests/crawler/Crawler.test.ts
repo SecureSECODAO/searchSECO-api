@@ -5,7 +5,7 @@ describe('Crawler', () => {
     let repo: any;
 
     beforeAll(async () => {
-        crawler = new Crawler("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", 100, 5);
+        crawler = new Crawler("your_PAT_here", 100, 5);
 
         // Fetch some repos for testing
         const repos = await crawler.getRepos(1);

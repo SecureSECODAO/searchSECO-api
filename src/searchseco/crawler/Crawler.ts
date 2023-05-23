@@ -48,16 +48,15 @@ export class Crawler {
     private async getLanguages(url: string): Promise<LanguageCount> {
         const res = await this.octo.request(`GET ${url}`);
         return res.data;
-      }
+    }
 
     /**
      * Crawls per page, starting from page 1.
-     * 
      * Creates a list of repos containing the URL, importance, and project ID.
-     * 
+     * Importance is currently measured as stargazer count.
      */
     public async crawl(): Promise<CrawlData> {
-        const URLImportanceList: Array<{url: string, importance: number, finalProjectId: number}> = [];
+        const URLImportanceList: Array<{ url: string, importance: number, finalProjectId: number }> = [];
         const languages: LanguageCount = {};
 
         let page = 1;
@@ -75,20 +74,20 @@ export class Crawler {
                     const url = repo.html_url;
                     const importance = repo.stargazers_count;
                     const projectId = repo.id;
-          
+
                     URLImportanceList.push({ url, importance, finalProjectId: projectId });
                     finalProjectId = projectId;
-          
+
                     const repoLanguages = await this.getLanguages(repo.languages_url);
                     for (const lang in repoLanguages) {
-                      languages[lang] = languages[lang] ? languages[lang] + 1 : 1;
+                        languages[lang] = languages[lang] ? languages[lang] + 1 : 1;
                     }
-                  });
-          
-                  await Promise.all(promises);
-                  page++;
+                });
+
+                await Promise.all(promises);
+                page++;
             }
-            catch (e){
+            catch (e) {
                 console.log(e);
                 break;
             }
@@ -97,12 +96,16 @@ export class Crawler {
         return { URLImportanceList, languages, finalProjectId };
     }
 
+    /**
+     * Retrieves metadata per repository.
+     * @param repo Repository to extract data from
+     */
     public async getProjectMetadata(repo: any): Promise<ProjectMetadata> {
         const { data } = await this.octo.rest.repos.get({
             owner: repo.owner.login,
             repo: repo.name
         });
-    
+
         const metadata: ProjectMetadata = {
             version: data.pushed_at,
             license: data.license ? data.license.name : "",
@@ -112,7 +115,7 @@ export class Crawler {
             authorMail: "",
             defaultBranch: data.default_branch,
         };
-    
+
         return metadata;
     }
 }
