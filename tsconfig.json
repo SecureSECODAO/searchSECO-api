@@ -17,8 +17,15 @@
   },
   "include": [
       "src/**/*",
+<<<<<<< HEAD
       "src/config/.env", 
       "src/tests/monetization/monetization.test.ts", 
       "src/tests/rewarding/rewarding.test.ts"  
     ]
 }
+=======
+      "src/config/.env",
+      "src/types/*"
+, "tests/monetization/monetization.test.ts", "tests/rewarding/rewarding.test.ts"  ]
+}
+>>>>>>> d8d980a20d32f2bf98d891975ecd1ed3bd08d913
