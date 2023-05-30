@@ -197,8 +197,25 @@ const job = new CronJob(
         // Loop through every session
         for (const [sessId, data] of sessions.entries()) {
             lock.acquire(`session_${sessId}`, () => {
+                let deleteSession = false;
+                switch (data.fetch_status) {
+                    case "idle":
+                    case "error":
+                        deleteSession = now - data.timestamp > 10 * 60 * 1000; // 10 minutes
+                        break;
+
+                    case "pending":
+                        deleteSession = now - data.timestamp > 30 * 60 * 1000; // 30 minutes
+                        break;
+
+                    case "success":
+                        deleteSession =
+                            now - data.timestamp > 2 * 60 * 60 * 1000; // 2 hours
+                        break;
+                }
+
                 // Delete if it's been more than 10 minutes
-                if (now - data.timestamp > 10 * 60 * 1000) {
+                if (deleteSession) {
                     sessions.delete(sessId);
                     console.log(`Deleted session ${sessId}`);
                 }
