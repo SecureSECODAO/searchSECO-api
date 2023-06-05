@@ -23,7 +23,7 @@ const getPrivateKey = async () => {
     } else {
         // The code snippet below will get the private key of the first account generated from the mnemonic
         const hdkDerivePath = "m/44'/60'/0'/0/0";
-        const seed = await mnemonicToSeed(config.DEV_MNEMONIC);
+        const seed = await mnemonicToSeed(config.DEV_MNEMONIC as `0x${string}`);
         const hdk = hdkey.fromMasterSeed(seed);
         const addr_node = hdk.derive(hdkDerivePath); // Gets first account
         const private_key = addr_node.privateKey;
@@ -59,11 +59,11 @@ const generateProof = async (
                 type: "uint256",
                 value: nonce as any,
             }
-        )
-    );
+        ) as string
+    ) as string;
 
     // Sign the hashed message
-    const key = await getPrivateKey();
+    const key = (await getPrivateKey()) as string;
     const signedData = web3provider.eth.accounts.sign(hashedMessage, key);
 
     // Return the signature
@@ -89,7 +89,7 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
         // Retrieve the user's current hash count, use this as the nonce
         if (config.NODE_ENV !== "test") {
             data = await client.readContract({
-                address: config.DAO_CONTRACT_ADDRESS,
+                address: config.DAO_CONTRACT_ADDRESS as `0x${string}`,
                 abi,
                 functionName: "getHashCount",
                 args: [address],

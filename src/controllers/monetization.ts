@@ -53,7 +53,7 @@ export const cost = async (req: Request, res: Response): Promise<void> => {
     try {
         // Get hash cost
         const data = await client.readContract({
-            address: config.DAO_CONTRACT_ADDRESS,
+            address: config.DAO_CONTRACT_ADDRESS as `0x${string}`,
             abi,
             functionName: "getHashCost",
         });
@@ -68,7 +68,7 @@ export const cost = async (req: Request, res: Response): Promise<void> => {
             cost: Number(totalCost),
             hashes: hashes.map((h) => h.Hash),
         });
-    } catch (error) {
+    } catch (error: any) {
         console.error(error);
         res.json({
             status: "error",

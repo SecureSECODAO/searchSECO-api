@@ -1,89 +1,110 @@
-import express from 'express'
-import bodyParser from 'body-parser';
-import { GithubInterface } from './src/spider/GithubInterface';
-import { TCPClient } from './src/databaseAPI/Client';
-import Parser from './src/parser/Parser';
-import { RequestType } from './src/databaseAPI/Request';
-import logger from 'morgan'
-import j from 'joi';
-import cors from 'cors'
+import express from "express";
+import bodyParser from "body-parser";
+import { GithubInterface } from "./src/spider/GithubInterface";
+import { TCPClient } from "./src/databaseAPI/Client";
+import Parser from "./src/parser/Parser";
+import { RequestType } from "./src/databaseAPI/Request";
+import logger from "morgan";
+import j from "joi";
+import cors from "cors";
 
-const app = express();
+export const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(logger('dev'))
-app.use(cors())
+app.use(logger("dev"));
+app.use(cors());
 
 // Validate the request body for the Fetch request.
-// The body must contain a url, github token and a valid ETH wallet address. 
-const fetchSchema = j.object().keys({
-    body: j.object().keys({
-        url: j.string().required(),
-        token: j.string().required(),
-        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/)//.required()
-    }).unknown().required()
-}).unknown()
+// The body must contain a url, github token and a valid ETH wallet address.
+const fetchSchema = j
+    .object()
+    .keys({
+        body: j
+            .object()
+            .keys({
+                url: j.string().required(),
+                token: j.string().required(),
+                wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/), //.required()
+            })
+            .unknown()
+            .required(),
+    })
+    .unknown();
 
 // Validate the request body for the Check request
 // The body must contain an array of valid MD5 hashes and a valid ETH wallet address
-const checkSchema = j.object().keys({
-    body: j.object().keys({
-        hashes: j.array().items(j.string().regex(/^[a-fA-F0-9]{32}$/i)).required(),
-        wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/)//.required()
-    }).unknown().required()
-}).unknown()
+const checkSchema = j
+    .object()
+    .keys({
+        body: j
+            .object()
+            .keys({
+                hashes: j
+                    .array()
+                    .items(j.string().regex(/^[a-fA-F0-9]{32}$/i))
+                    .required(),
+                wallet: j.string().regex(/^0x[a-fA-F0-9]{40}$/), //.required()
+            })
+            .unknown()
+            .required(),
+    })
+    .unknown();
 
-app.post('/fetch', async (req: any, res: any) => {
-    res.setHeader('Content-Type', 'application/json')
+app.post("/fetch", async (req: any, res: any) => {
+    res.setHeader("Content-Type", "application/json");
     try {
-        const validated =  fetchSchema.validate(req)
-        if (validated.error)
-            throw validated.error
-        
-        const { body: { url, token, wallet } } = validated.value
+        const validated = fetchSchema.validate(req);
+        if (validated.error) throw validated.error;
 
-        const githubInterface = new GithubInterface(token)
-        const dirName = await githubInterface.DownloadRepository(url)
+        const {
+            body: { url, token, wallet },
+        } = validated.value;
 
-        if (!dirName)
-            throw new Error("Cannot find repository.")
+        const githubInterface = new GithubInterface(token);
+        const dirName = await githubInterface.DownloadRepository(url);
 
-        const { filenames, result } = await Parser.ParseFiles({ path: dirName })
+        if (!dirName) throw new Error("Cannot find repository.");
 
-        await GithubInterface.ClearCache(dirName)
+        const { filenames, result } = await Parser.ParseFiles({
+            path: dirName,
+        });
 
-        res.end(JSON.stringify(result))
+        await GithubInterface.ClearCache(dirName);
 
+        res.end(JSON.stringify(result));
+    } catch (e: any) {
+        res.status(e.status || 500);
+        res.end(JSON.stringify(e));
     }
-    catch (e: any) {
-        res.status(e.status || 500)
-        res.end(JSON.stringify(e))
-    }
-})
+});
 
-app.post('/check', async (req, res) => {
-    const validated = checkSchema.validate(req)
-    if (validated.error)
-        throw validated.error
+app.post("/check", async (req, res) => {
+    const validated = checkSchema.validate(req);
+    if (validated.error) throw validated.error;
 
-    const { body: { hashes } } = validated.value
+    const {
+        body: { hashes },
+    } = validated.value;
 
-    const tcpClient = new TCPClient('dao', process.env.DB_PORT || 8003, process.env.DB_HOST || '127.0.0.1')
-    const response = await tcpClient.Check(hashes)
+    const tcpClient = new TCPClient(
+        "dao",
+        process.env.DB_PORT || 8003,
+        process.env.DB_HOST || "127.0.0.1"
+    );
+    const response = await tcpClient.Check(hashes);
 
-    const formatted = { 
-        methodData: response[0].response, 
-        authorData: response[1].response, 
-        projectData: response[2].response
-    }
+    const formatted = {
+        methodData: response[0].response,
+        authorData: response[1].response,
+        projectData: response[2].response,
+    };
 
-    res.end(JSON.stringify(formatted))
-})
+    res.end(JSON.stringify(formatted));
+});
 
-const server = app.listen({ port: process.env.PORT || 8080 })
+const server = app.listen({ port: process.env.PORT || 8080 });
 
 const addr = server.address();
-const binding = typeof addr === 'string'
-    ? `pipe/socket ${addr}`
-    : `port ${addr?.port}`;
+const binding =
+    typeof addr === "string" ? `pipe/socket ${addr}` : `port ${addr?.port}`;
 console.log(`🚀 Server listening on ${binding}`);

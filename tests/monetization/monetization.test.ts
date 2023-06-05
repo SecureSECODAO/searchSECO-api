@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../src/app";
+import { app } from "../../server";
 
 const githubToken = process.env.GITHUB_TOKEN;
 if (!githubToken) {
