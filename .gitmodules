@@ -13,3 +13,9 @@
 [submodule "src/searchseco/searchSECO-databaseAPI"]
 	path = src/searchseco/searchSECO-databaseAPI
 	url = https://github.com/SecureSECODAO/searchSECO-databaseAPI.git
+[submodule "src/searchseco/searchSECO-spider"]
+	path = src/searchseco/searchSECO-spider
+	url = https://github.com/SecureSECODAO/searchSECO-spider.git
+[submodule "src/searchseco/searchSECO-crawler"]
+	path = src/searchseco/searchSECO-crawler
+	url = https://github.com/SecureSECODAO/searchSECO-crawler.git

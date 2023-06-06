@@ -1,1 +1,0 @@
-emcmake cmake ../SearchSECOCrawler/SearchSECOCrawler -G "MinGW Makefiles"
