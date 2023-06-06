@@ -1,10 +1,10 @@
 import request from "supertest";
 import { app } from "../../app";
 
-const githubToken = process.env.GITHUB_TOKEN;
-if (!githubToken) {
-    throw new Error("GITHUB_TOKEN not set in .env.test.local");
-}
+// const githubToken = process.env.GITHUB_TOKEN;
+// if (!githubToken) {
+//     throw new Error("GITHUB_TOKEN not set in .env.test.local");
+// }
 
 describe("POST /monetization/cost", () => {
     it("should be able to retrieve the cost of a repository", (done) => {
@@ -13,7 +13,6 @@ describe("POST /monetization/cost", () => {
             .post("/api/monetization/cost")
             .send({
                 url: repo,
-                token: githubToken,
             })
             .set("Accept", "application/json")
             .end((err, res) => {
@@ -33,34 +32,16 @@ describe("POST /monetization/cost", () => {
             .post("/api/monetization/cost")
             .send({
                 url: repo,
-                token: githubToken,
             })
             .set("Accept", "application/json")
             .end((err, res) => {
                 const json = res.body;
+
+                console.log(json);
 
                 expect(res.status).toBe(200);
                 expect(json.status).toBe("error");
                 expect(json.error).toBe("Cannot find repository.");
-                done();
-            });
-    });
-
-    it("should return an error if an invalid token is provided", (done) => {
-        const repo = "https://github.com/i-voted-for-trump/is-even";
-
-        request(app)
-            .post("/api/monetization/cost")
-            .send({
-                url: repo,
-                token: "invalid",
-            })
-            .set("Accept", "application/json")
-            .end((err, res) => {
-                const json = res.body;
-
-                expect(res.status).toBe(200);
-                expect(json.status).toBe("error");
                 done();
             });
     });

@@ -7,7 +7,7 @@ const Config: Config.InitialOptions = {
     },
     modulePathIgnorePatterns: ["<rootDir>/dist/", "<rootDir>/.tmp"],
 
-    setupFiles: ["<rootDir>/tests/setup/setup.ts"],
+    setupFiles: ["<rootDir>/src/tests/setup/setup.ts"],
 };
 
 export default Config;

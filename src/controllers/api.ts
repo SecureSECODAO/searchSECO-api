@@ -3,17 +3,17 @@ import Spider from "../searchseco/searchSECO-spider/src/Spider";
 import Parser from "../searchseco/searchSECO-parser/src/Parser";
 import { TCPClient } from "../searchseco/searchSECO-databaseAPI/src/Client";
 import config from "../config/config";
-import path from 'path'
-import fs from 'fs'
+import path from "path";
+import fs from "fs";
 import { Verbosity } from "../searchseco/searchSECO-parser/src/searchSECO-logger/src/Logger";
 
-const DOWNLOAD_LOCATION = path.join(__dirname, '../../.tmp')
+const DOWNLOAD_LOCATION = path.join(__dirname, "../../.tmp");
 
 export async function fetch(req: Request, res: Response): Promise<void> {
     try {
-        const { url, branch, token, address } = req.body;
+        const { url, branch } = req.body;
 
-        const result = await fetchHashes(url, branch, token);
+        const result = await fetchHashes(url, branch);
 
         res.status(200).json(result);
     } catch (e: any) {
@@ -28,14 +28,17 @@ export async function fetch(req: Request, res: Response): Promise<void> {
  * @param token Github token
  * @returns List of HashData
  */
-export async function fetchHashes(url: string, branch: string, token: string) {
+export async function fetchHashes(url: string, branch: string) {
     const spider = new Spider();
-    await spider.downloadRepo(url, DOWNLOAD_LOCATION, branch)
+    await spider.downloadRepo(url, DOWNLOAD_LOCATION, branch);
 
-    const { result } = await Parser.ParseFiles(DOWNLOAD_LOCATION, Verbosity.SILENT);
+    const { result } = await Parser.ParseFiles(
+        DOWNLOAD_LOCATION,
+        Verbosity.SILENT
+    );
 
-    fs.rmSync(DOWNLOAD_LOCATION, { force: true, recursive: true })
-    
+    fs.rmSync(DOWNLOAD_LOCATION, { force: true, recursive: true });
+
     return result;
 }
 
