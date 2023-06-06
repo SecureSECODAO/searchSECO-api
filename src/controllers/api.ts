@@ -62,9 +62,9 @@ export async function checkHashes(hashes: string[]) {
     ).map((res) => res.response);
 
     // sanitize email
-    authorData.forEach(
-        (author: any) => (author.email = author.email.replace(/<|>/g, ""))
-    );
+    authorData.forEach((author: any) => {
+        if (author.email) author.email = author.email.replace(/<|>/g, "");
+    });
 
     const formatted = {
         methodData,
