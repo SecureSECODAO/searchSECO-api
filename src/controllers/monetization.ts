@@ -151,7 +151,6 @@ const handlePaidSession = async (sessId: string): Promise<void> => {
                 session.fetch_status = "success";
                 session.data = response;
 
-                sessions.delete(sessId);
                 console.log(`Session ${sessId} data fetched`);
             } catch (error) {
                 console.error(error);
@@ -210,7 +209,7 @@ const job = new CronJob(
 
                     case "success":
                         deleteSession =
-                            now - data.timestamp > 2 * 60 * 60 * 1000; // 2 hours
+                            now - data.timestamp > 24 * 60 * 60 * 1000; // 24 hours
                         break;
                 }
 
