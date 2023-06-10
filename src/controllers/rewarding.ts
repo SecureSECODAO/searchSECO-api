@@ -5,6 +5,7 @@ import hdkey from "hdkey";
 import { Request, Response } from "express";
 import { client } from "./monetization";
 import { abi } from "../abi/rewarding_abi";
+import { dbClient } from "../app";
 
 const web3provider = new Web3(
     new Web3.providers.HttpProvider(
@@ -79,11 +80,27 @@ const generateProof = async (
  * Checks the hashes submitted by the user and generates a proof that the user can use to claim their reward.
  */
 export const reward = async (req: Request, res: Response): Promise<void> => {
-    const { hashes, address } = req.body;
+    const { address } = req.body;
 
     try {
-        // Somehow check the amount of new hashes
-        // hashes = ... ???
+        const result = await dbClient.execute(
+            "SELECT * FROM rewarding.miners WHERE wallet = ? ALLOW FILTERING", // FIXME: Remove ALLOW FILTERING
+            [req.query.address],
+            { prepare: true }
+        );
+
+        if (result.rows.length === 0) {
+            res.json({
+                status: "error",
+                error: "Address not found",
+            });
+            return;
+        }
+
+        let totalHashes = 0;
+        for (const row of result.rows) {
+            totalHashes += parseInt(row.claimable_hashes);
+        }
 
         let data;
         // Retrieve the user's current hash count, use this as the nonce
@@ -102,13 +119,37 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
         const nonce = data as number;
 
         // Generate proof
-        const proof = await generateProof(address, hashes.length, nonce);
+        const proof = await generateProof(address, totalHashes, nonce);
 
         res.json({
             status: "ok",
             proof,
         });
     } catch (error: any) {
+        console.error(error);
+        res.json({
+            status: "error",
+            error: error.message,
+        });
+    }
+};
+
+export const miningData = async (
+    req: Request,
+    res: Response
+): Promise<void> => {
+    try {
+        const result = await dbClient.execute(
+            "SELECT * FROM rewarding.miners WHERE wallet = ? ALLOW FILTERING", // FIXME: Remove ALLOW FILTERING
+            [req.query.address],
+            { prepare: true }
+        );
+
+        res.json({
+            status: "ok",
+            data: result.rows,
+        });
+    } catch (error) {
         console.error(error);
         res.json({
             status: "error",

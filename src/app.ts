@@ -1,25 +1,42 @@
-import express from 'express'
-import logger from 'morgan'
-import * as path from 'path'
+import express from "express";
+import logger from "morgan";
+import * as path from "path";
 
-import { errorHandler, errorNotFoundHandler } from './middleware/errorHandler'
-import { api } from './routes/api'
+import { errorHandler, errorNotFoundHandler } from "./middleware/errorHandler";
 
-import cors from "cors"
+import cors from "cors";
 
-import { errors } from "celebrate"
+import { errors } from "celebrate";
 
-export const app = express()
+import cassandra from "cassandra-driver";
+import config from "./config/config";
 
-app.use(express.json())
-app.use(cors())
-app.use(logger("dev"))
+export const dbClient = new cassandra.Client({
+    contactPoints: [`${config.DB_HOST}:8002`],
+    localDataCenter: "dcscience-vs317.science.uu.nl",
+    authProvider: new cassandra.auth.PlainTextAuthProvider(
+        "cassandra",
+        "cassandra"
+    ),
+    keyspace: "rewarding",
+});
 
-app.set("port", process.env.PORT || 8080)
+dbClient.connect().then(() => {
+    console.log("🛢  Connected to Cassandra DB");
+});
 
-app.use("/api", api)
+import { api } from "./routes/api";
 
-app.use(errors())
-app.use(errorNotFoundHandler)
-app.use(errorHandler)
+export const app = express();
 
+app.use(express.json());
+app.use(cors());
+app.use(logger("dev"));
+
+app.set("port", process.env.PORT || 8080);
+
+app.use("/api", api);
+
+app.use(errors());
+app.use(errorNotFoundHandler);
+app.use(errorHandler);
