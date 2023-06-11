@@ -19,18 +19,20 @@ const web3provider = new Web3(
  * @returns the private key of the account that will be used to sign the proof
  */
 const getPrivateKey = async () => {
-    if (config.NODE_ENV === "production") {
-        return config.PRIVATE_KEY;
-    } else {
-        // The code snippet below will get the private key of the first account generated from the mnemonic
-        const hdkDerivePath = "m/44'/60'/0'/0/0";
-        const seed = await mnemonicToSeed(config.DEV_MNEMONIC);
-        const hdk = hdkey.fromMasterSeed(seed);
-        const addr_node = hdk.derive(hdkDerivePath); // Gets first account
-        const private_key = addr_node.privateKey;
+    // if (config.NODE_ENV === "production") {
+    //     return config.PRIVATE_KEY;
+    // } else {
+    //     // The code snippet below will get the private key of the first account generated from the mnemonic
+    //     const hdkDerivePath = "m/44'/60'/0'/0/0";
+    //     const seed = await mnemonicToSeed(config.DEV_MNEMONIC);
+    //     const hdk = hdkey.fromMasterSeed(seed);
+    //     const addr_node = hdk.derive(hdkDerivePath); // Gets first account
+    //     const private_key = addr_node.privateKey;
 
-        return private_key.toString("hex");
-    }
+    //     return private_key.toString("hex");
+    // }
+
+    return config.PRIVATE_KEY;
 };
 
 /**
@@ -85,7 +87,7 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
     try {
         const result = await dbClient.execute(
             "SELECT * FROM rewarding.miners WHERE wallet = ? ALLOW FILTERING", // FIXME: Remove ALLOW FILTERING
-            [req.query.address],
+            [address],
             { prepare: true }
         );
 
@@ -116,7 +118,7 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
             console.log("Using test data");
         }
 
-        const nonce = data as number;
+        const nonce = Number(data);
 
         // Generate proof
         const proof = await generateProof(address, totalHashes, nonce);
@@ -124,6 +126,7 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
         res.json({
             status: "ok",
             proof,
+            nonce,
         });
     } catch (error: any) {
         console.error(error);
