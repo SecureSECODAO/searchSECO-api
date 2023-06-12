@@ -1,9 +1,12 @@
-[submodule "modules/SearchSECOSpider"]
-	path = modules/SearchSECOSpider
-	url = https://github.com/SecureSECO/SearchSECOSpider.git
-[submodule "modules/SearchSECOParser"]
-	path = modules/SearchSECOParser
-	url = https://github.com/SecureSECO/SearchSECOParser.git
-[submodule "modules/SearchSECOCrawler"]
-	path = modules/SearchSECOCrawler
-	url = https://github.com/SecureSECO/SearchSECOCrawler.git
+[submodule "src/searchseco/searchSECO-parser"]
+	path = src/searchseco/searchSECO-parser
+	url = https://github.com/SecureSECODAO/searchSECO-parser
+[submodule "src/searchseco/searchSECO-databaseAPI"]
+	path = src/searchseco/searchSECO-databaseAPI
+	url = https://github.com/SecureSECODAO/searchSECO-databaseAPI.git
+[submodule "src/searchseco/searchSECO-spider"]
+	path = src/searchseco/searchSECO-spider
+	url = https://github.com/SecureSECODAO/searchSECO-spider.git
+[submodule "src/searchseco/searchSECO-crawler"]
+	path = src/searchseco/searchSECO-crawler
+	url = https://github.com/SecureSECODAO/searchSECO-crawler.git

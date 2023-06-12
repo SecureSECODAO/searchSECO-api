@@ -48,7 +48,7 @@ const sessions = new Map<string, SessionData>();
  */
 export const cost = async (req: Request, res: Response): Promise<void> => {
     const url = req.body.url as string;
-    const token = req.body.token as string;
+    const branch = req.body.branch as string;
 
     try {
         // Get hash cost
@@ -59,7 +59,7 @@ export const cost = async (req: Request, res: Response): Promise<void> => {
         });
 
         let costPerHash = data as bigint;
-        const hashes = await fetchHashes(url, token);
+        const hashes = await fetchHashes(url, branch);
 
         let totalCost = costPerHash * BigInt(hashes.length);
 

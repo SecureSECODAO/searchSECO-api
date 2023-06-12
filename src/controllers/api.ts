@@ -1,14 +1,19 @@
 import { Request, Response } from "express";
-import { GithubInterface } from "../searchseco/spider/GithubInterface";
-import Parser from "../searchseco/parser/Parser";
-import { TCPClient } from "../searchseco/databaseAPI/Client";
+import Spider from "../searchseco/searchSECO-spider/src/Spider";
+import Parser from "../searchseco/searchSECO-parser/src/Parser";
+import { TCPClient } from "../searchseco/searchSECO-databaseAPI/src/Client";
 import config from "../config/config";
+import path from "path";
+import fs from "fs";
+import { Verbosity } from "../searchseco/searchSECO-parser/src/searchSECO-logger/src/Logger";
+
+const DOWNLOAD_LOCATION = path.join(__dirname, "../../.tmp");
 
 export async function fetch(req: Request, res: Response): Promise<void> {
     try {
-        const { url, token, address } = req.body;
+        const { url, branch } = req.body;
 
-        const result = await fetchHashes(url, token);
+        const result = await fetchHashes(url, branch);
 
         res.status(200).json(result);
     } catch (e: any) {
@@ -23,17 +28,20 @@ export async function fetch(req: Request, res: Response): Promise<void> {
  * @param token Github token
  * @returns List of HashData
  */
-export async function fetchHashes(url: string, token: string) {
-    const githubInterface = new GithubInterface(token);
-    const dirName = await githubInterface.DownloadRepository(url);
+export async function fetchHashes(url: string, branch: string) {
+    const spider = new Spider();
+    const success = await spider.downloadRepo(url, DOWNLOAD_LOCATION, branch);
 
-    if (!dirName) throw new Error("Cannot find repository.");
+    if (!success) {
+        throw new Error("Failed to download repository");
+    }
 
-    const { filenames, result } = await Parser.ParseFiles({
-        path: dirName,
-    });
+    const { result } = await Parser.ParseFiles(
+        DOWNLOAD_LOCATION,
+        Verbosity.SILENT
+    );
 
-    await GithubInterface.ClearCache(dirName);
+    fs.rmSync(DOWNLOAD_LOCATION, { force: true, recursive: true });
 
     return result;
 }
@@ -54,8 +62,9 @@ export async function check(req: Request, res: Response): Promise<void> {
 export async function checkHashes(hashes: string[]) {
     const tcpClient = new TCPClient(
         "dao",
+        config.DB_HOST || "127.0.0.1",
         config.DB_PORT || 8003,
-        config.DB_HOST || "127.0.0.1"
+        Verbosity.SILENT
     );
     const [methodData, authorData, projectData] = (
         await tcpClient.Check(hashes)
