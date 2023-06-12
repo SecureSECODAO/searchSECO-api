@@ -1,0 +1,22 @@
+diff --git a/node_modules/@jest/types/build/index.d.ts b/node_modules/@jest/types/build/index.d.ts
+index 8a6b119..5fc4673 100644
+--- a/node_modules/@jest/types/build/index.d.ts
++++ b/node_modules/@jest/types/build/index.d.ts
+@@ -8,7 +8,7 @@
+ 
+ import type {Arguments} from 'yargs';
+ import type {CoverageMapData} from 'istanbul-lib-coverage';
+-import type {ForegroundColor} from 'chalk';
++// import type {ForegroundColor} from 'chalk';
+ import type {ReportOptions} from 'istanbul-reports';
+ import type {SnapshotFormat} from '@jest/schemas';
+ 
+@@ -414,7 +414,7 @@ declare type DescribeBlock = {
+ 
+ declare type DisplayName = {
+   name: string;
+-  color: typeof ForegroundColor;
++  color: any;
+ };
+ 
+ declare type DoneFn = Global.DoneFn;

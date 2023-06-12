@@ -18,7 +18,9 @@
         "build-ts": "tsc && copyfiles -f .\\src\\config\\.env .\\dist\\config",
         "gen-js": "npx antlr4ts-cli -o ./src/searchseco/parser/languages/javascript/lib -visitor ./src/searchseco/parser/languages/javascript/grammars/JavaScriptLexer.g4 && npx antlr4ts-cli -o ./src/searchseco/parser/languages/javascript/lib -visitor ./src/searchseco/parser/languages/javascript/grammars/JavaScriptParser.g4",
         "gen-py3": "npx antlr4ts-cli -o ./src/searchseco/parser/languages/python3/lib -visitor ./src/searchseco/parser/languages/python3/grammars/Python3.g4",
-        "gen-cpp": "npx antlr4ts-cli -o ./src/searchseco/parser/languages/cpp/lib -visitor ./src/searchseco/parser/languages/cpp/grammars/CPP14Lexer.g4 && npx antlr4ts-cli -o ./src/searchseco/parser/languages/cpp/lib -visitor ./src/searchseco/parser/languages/cpp/grammars/CPP14Parser.g4"
+        "gen-cpp": "npx antlr4ts-cli -o ./src/searchseco/parser/languages/cpp/lib -visitor ./src/searchseco/parser/languages/cpp/grammars/CPP14Lexer.g4 && npx antlr4ts-cli -o ./src/searchseco/parser/languages/cpp/lib -visitor ./src/searchseco/parser/languages/cpp/grammars/CPP14Parser.g4",
+        "postinstall": "patch-package",
+        "heroku-postbuild": "patch-package"
     },
     "author": "Wouter Beffes",
     "license": "MIT",
@@ -46,6 +48,7 @@
         "morgan": "^1.10.0",
         "node": "^19.8.1",
         "octokit": "^2.0.14",
+        "patch-package": "^7.0.0",
         "path": "^0.12.7",
         "request-promise": "^4.2.6",
         "searchseco-crawler": "file:src/searchseco/searchSECO-crawler",
@@ -56,11 +59,7 @@
         "uuid": "^9.0.0",
         "viem": "^0.3.17",
         "web3": "^1.9.0",
-        "xml2js": "^0.5.0",
-        "searchseco-parser": "file:src/searchseco/searchSECO-parser",
-        "searchseco-spider": "file:src/searchseco/searchSECO-spider",
-        "searchseco-crawler": "file:src/searchseco/searchSECO-crawler",
-        "searchseco-databaseapi": "file:src/searchseco/searchSECO-databaseAPI"
+        "xml2js": "^0.5.0"
     },
     "devDependencies": {
         "@jest/types": "^29.5.0",
@@ -93,10 +92,6 @@
         "supertest": "^6.3.3",
         "ts-jest": "^29.1.0",
         "ts-node": "^10.9.1",
-        "winston": "^3.8.2",
-        "searchseco-parser": "file:src/searchseco/searchSECO-parser",
-        "searchseco-spider": "file:src/searchseco/searchSECO-spider",
-        "searchseco-crawler": "file:src/searchseco/searchSECO-crawler",
-        "searchseco-databaseapi": "file:src/searchseco/searchSECO-databaseAPI"
+        "winston": "^3.8.2"
     }
 }
