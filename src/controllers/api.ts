@@ -30,7 +30,11 @@ export async function fetch(req: Request, res: Response): Promise<void> {
  */
 export async function fetchHashes(url: string, branch: string) {
     const spider = new Spider();
-    await spider.downloadRepo(url, DOWNLOAD_LOCATION, branch);
+    const success = await spider.downloadRepo(url, DOWNLOAD_LOCATION, branch);
+
+    if (!success) {
+        throw new Error("Failed to download repository");
+    }
 
     const { result } = await Parser.ParseFiles(
         DOWNLOAD_LOCATION,
