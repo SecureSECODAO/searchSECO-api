@@ -9,7 +9,8 @@ api.post(
     celebrate({
         body: Joi.object().keys({
             url: Joi.string().uri().required(),
-            token: Joi.string().required(),
+            branch: Joi.string().default("master"),
+            token: Joi.string().optional(),
         }),
     }),
     controller.cost

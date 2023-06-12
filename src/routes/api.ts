@@ -12,7 +12,7 @@ api.post(
         body: Joi.object()
             .keys({
                 url: Joi.string().required(),
-                token: Joi.string().required(),
+                branch: Joi.string().default("master"),
                 address: Joi.string().regex(/^0x[a-fA-F0-9]{40}$/), //.required()
             })
             .unknown()

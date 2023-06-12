@@ -1,5 +1,5 @@
 import request from "supertest";
-import { app } from "../../src/app";
+import { app } from "../../app";
 
 describe("POST /rewarding/reward", () => {
     it("should return an error when no query params are provided", (done) => {
