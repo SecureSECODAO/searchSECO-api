@@ -90,7 +90,7 @@ const generateProof = async (
  * Checks the hashes submitted by the user and generates a proof that the user can use to claim their reward.
  */
 export const reward = async (req: Request, res: Response): Promise<void> => {
-    const { address } = req.body;
+    const { address, nonce } = req.body;
 
     try {
         const result = await dbClient.execute(
@@ -126,15 +126,12 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
             console.log("Using test data");
         }
 
-        const nonce = Number(data);
-
         // Generate proof
         const proof = await generateProof(address, totalHashes, nonce);
 
         res.json({
             status: "ok",
             proof,
-            nonce,
         });
     } catch (error: any) {
         console.error(error);

@@ -19,6 +19,8 @@ import { errors } from "celebrate";
 import cassandra from "cassandra-driver";
 import config from "./config/config";
 
+console.log(`🌎  Environment: ${process.env.NODE_ENV}`);
+
 export const dbClient = new cassandra.Client({
     contactPoints: [`${config.DB_HOST}:8002`],
     localDataCenter: "dcscience-vs317.science.uu.nl",

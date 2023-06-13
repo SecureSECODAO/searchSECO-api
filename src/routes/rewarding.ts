@@ -19,6 +19,7 @@ api.post(
             address: Joi.string()
                 .pattern(/^0x[a-fA-F0-9]{40}$/)
                 .required(),
+            nonce: Joi.number().required(),
         }),
     }),
     controller.reward

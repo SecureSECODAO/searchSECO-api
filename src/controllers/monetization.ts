@@ -17,7 +17,6 @@ import AsyncLock from "async-lock";
 import config from "../config/config";
 import { abi } from "../abi/monetization_abi";
 import { check, checkHashes, fetchHashes } from "./api";
-import { decodeEventLog } from "viem";
 
 export const monetization = Router();
 
@@ -31,7 +30,11 @@ const lock = new AsyncLock();
  */
 export const client = createPublicClient({
     chain: config.NODE_ENV === "production" ? polygon : polygonMumbai,
-    transport: http(),
+    transport: http(
+        config.NODE_ENV === "production"
+            ? "https://rpc.ankr.com/polygon"
+            : "https://rpc.ankr.com/polygon_mumbai"
+    ),
 });
 
 /**
