@@ -1,4 +1,4 @@
-# searchSECO-api
+# SearchSECO-API
 
 This API contains the essential endpoints and modules to pull, parse and check a project against the SecureSECO database.
 This README is still incomplete and will ben expanded upon later.
@@ -184,3 +184,11 @@ At the root level, create a file called .env.test.local. See .env.test.local.exa
 ## Running the tests
 
 To run the tests, run `npm run test`. Note that this runs the tests in silent mode, so you won't see any output. To see the output, run `npm run test-verbose`.
+
+# License
+
+This project is licensed under the MIT license. See [LICENSE](/LICENSE) for more info.
+
+This program has been developed by students from the bachelor Computer Science at
+Utrecht University within the Software Project course. © Copyright Utrecht University
+(Department of Information and Computing Sciences)
