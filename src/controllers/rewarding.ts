@@ -1,6 +1,6 @@
 /**
  * This program has been developed by students from the bachelor Computer Science at Utrecht University within the Software Project course.
- * © Copyright Utrecht University (Department of Information and Computing Sciences)
+ * ï¿½ Copyright Utrecht University (Department of Information and Computing Sciences)
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -11,7 +11,7 @@ import Web3 from "web3";
 import { mnemonicToSeed } from "bip39";
 import hdkey from "hdkey";
 import { Request, Response } from "express";
-import { client } from "./monetization";
+import { contract } from "./monetization";
 import { abi } from "../abi/rewarding_abi";
 import { dbClient } from "../app";
 
@@ -110,20 +110,6 @@ export const reward = async (req: Request, res: Response): Promise<void> => {
         let totalHashes = 0;
         for (const row of result.rows) {
             totalHashes += parseInt(row.claimable_hashes);
-        }
-
-        let data;
-        // Retrieve the user's current hash count, use this as the nonce
-        if (config.NODE_ENV !== "test") {
-            data = await client.readContract({
-                address: config.DAO_CONTRACT_ADDRESS,
-                abi,
-                functionName: "getHashCount",
-                args: [address],
-            });
-        } else {
-            data = 1;
-            console.log("Using test data");
         }
 
         // Generate proof

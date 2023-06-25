@@ -9,9 +9,8 @@
 import { celebrate, Joi } from "celebrate";
 import { Router, Request, Response } from "express";
 import * as controller from "../controllers/monetization";
+import { BigNumber, ethers } from "ethers";
 import { v4 as uuidv4 } from "uuid";
-import { createPublicClient, encodeEventTopics, http } from "viem";
-import { mainnet, goerli, polygonMumbai, polygon } from "viem/chains";
 import { CronJob } from "cron";
 import AsyncLock from "async-lock";
 import config from "../config/config";
@@ -25,17 +24,19 @@ export const monetization = Router();
  */
 const lock = new AsyncLock();
 
-/**
- * Create a client so we can listen to events from the contract
- */
-export const client = createPublicClient({
-    chain: config.NODE_ENV === "production" ? polygon : polygonMumbai,
-    transport: http(
-        config.NODE_ENV === "production"
-            ? "https://rpc.ankr.com/polygon"
-            : "https://rpc.ankr.com/polygon_mumbai"
-    ),
-});
+// Create a provider so we can read from the blockchain
+const provider = new ethers.providers.JsonRpcProvider(
+    process.env.NODE_ENV === "production"
+        ? "https://rpc.ankr.com/polygon"
+        : "https://rpc.ankr.com/polygon_mumbai"
+);
+
+// Create contract instance so we can listen to events and call functions
+export const contract = new ethers.Contract(
+    process.env.DAO_CONTRACT_ADDRESS as any,
+    abi,
+    provider
+);
 
 /**
  * Represents a session. A session is used to track the status of a payment / query.
@@ -46,6 +47,7 @@ type SessionData = {
     timestamp: number;
     fetch_status: "idle" | "pending" | "success" | "error";
     data?: any;
+    error?: string;
 };
 
 /**
@@ -63,20 +65,16 @@ export const cost = async (req: Request, res: Response): Promise<void> => {
 
     try {
         // Get hash cost
-        const data = await client.readContract({
-            address: config.DAO_CONTRACT_ADDRESS,
-            abi,
-            functionName: "getHashCost",
-        });
+        const data: BigNumber = await contract.getHashCost();
 
-        let costPerHash = data as bigint;
+        let costPerHash = data;
         const hashes = await fetchHashes(url, branch);
 
-        let totalCost = costPerHash * BigInt(hashes.length);
+        let totalCost = costPerHash.mul(BigNumber.from(hashes.length));
 
         res.json({
             status: "ok",
-            cost: totalCost.toString(16),
+            cost: totalCost.toHexString().substring(2),
             hashes: hashes.map((h) => h.Hash),
         });
     } catch (error) {
@@ -120,41 +118,50 @@ export const startSession = async (
 };
 
 /**
- * Watch for sessions that are paid, then handle them. The unwatch function
- * is used to stop watching for events.
+ * Watch for sessions that are paid, then handle them.
  */
-const unwatch = client.watchContractEvent({
-    address: config.DAO_CONTRACT_ADDRESS as any,
-    abi,
-    eventName: "PaymentProcessed",
-    onLogs: (logs) => {
-        for (const log of logs) {
-            console.log(
-                `PaymentProcessed(sender: ${log.args.sender}, amount: ${log.args.amount}, uniqueId: ${log.args.uniqueId})`
-            );
+contract.on(
+    "PaymentProcessed(address,uint256,string)",
+    (sender, amount, uniqueId: string) => {
+        console.log(
+            `PaymentProcessed(sender: ${sender}, amount: ${amount}, uniqueId: ${uniqueId})`
+        );
 
-            const sessId = log.args.uniqueId;
-            handlePaidSession(sessId);
-        }
-    },
-});
+        handlePaidSession(amount, uniqueId);
+    }
+);
 
 /**
  * This function is called when a session is paid, and it will fetch the data
  * for the given hashes from the database API.
+ * @param amount Amount of hashes paid for
  * @param sessId Session ID to handle
  */
-const handlePaidSession = async (sessId: string): Promise<void> => {
+const handlePaidSession = async (
+    amount: BigNumber,
+    sessId: string
+): Promise<void> => {
     await lock.acquire(`session_${sessId}`, async () => {
         const session = sessions.get(sessId);
 
         if (session) {
+            // Make sure that enough hashes were paid for
+            if (BigNumber.from(session.hashes.length).gt(amount)) {
+                console.log(
+                    `Session ${sessId} was paid, but not enough hashes were paid for (${amount} < ${session.hashes.length})`
+                );
+                session.fetch_status = "error";
+                session.error = `Not enough hashes were paid for, expected ${session.hashes.length}, got ${amount}`;
+                return;
+            }
+
             console.log(
-                `Session ${sessId} was paid, num. hashes: ${session.hashes.length}`
+                `Session ${sessId} was paid, num. of hashes: ${session.hashes.length}`
             );
 
             session.fetch_status = "pending";
 
+            console.log(`Fetching data for session ${sessId}...`);
             try {
                 const response = await checkHashes(session.hashes);
                 if (!response) throw new Error("No response from checkHashes");
@@ -162,10 +169,12 @@ const handlePaidSession = async (sessId: string): Promise<void> => {
                 session.fetch_status = "success";
                 session.data = response;
 
-                console.log(`Session ${sessId} data fetched`);
+                console.log(`Session ${sessId} data fetched!`);
+                // console.log(response);
             } catch (error) {
                 console.error(error);
                 session.fetch_status = "error";
+                session.error = error.message || "Unknown error";
                 return;
             }
         } else {
@@ -189,6 +198,7 @@ export const getData = async (req: Request, res: Response): Promise<void> => {
             data: session.data,
             fetch_status: session.fetch_status,
             timestamp: session.timestamp,
+            error: session.error,
         });
     } else {
         res.json({
