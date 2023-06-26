@@ -1,6 +1,6 @@
 /**
  * This program has been developed by students from the bachelor Computer Science at Utrecht University within the Software Project course.
- * © Copyright Utrecht University (Department of Information and Computing Sciences)
+ * ï¿½ Copyright Utrecht University (Department of Information and Computing Sciences)
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
@@ -20,7 +20,7 @@ api.post(
         body: Joi.object()
             .keys({
                 url: Joi.string().required(),
-                branch: Joi.string().default("master"),
+                branch: Joi.string(),
                 address: Joi.string().regex(/^0x[a-fA-F0-9]{40}$/), //.required()
             })
             .unknown()
